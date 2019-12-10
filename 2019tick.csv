@@ -1,0 +1,86 @@
+date,cage_ID,site,block,plot,Location_ID,death_t_f,experiment
+7/9/2019,1,Intermediate,1,Control,"""Under Oak""",1,0
+7/9/2019,2,Intermediate,1,Control,"""Open""",1,0
+7/9/2019,3,Intermediate,1,Control,"""Rabbitbrush""",1,0
+7/9/2019,4,Intermediate,1,Total,"""Under Oak""",1,0
+7/9/2019,5,Intermediate,1,Total,"""Open""",1,0
+7/9/2019,6,Intermediate,1,Total,"""Rabbitbrush""",1,0
+7/9/2019,7,Intermediate,1,Partial,"""Under Oak""",1,0
+7/9/2019,8,Intermediate,1,Partial,"""Open""",1,0
+7/9/2019,9,Intermediate,1,Partial,"""Rabbitbrush""",1,0
+7/9/2019,1',Intermediate,2,Control,"""Under Oak""",1,0
+7/9/2019,2',Intermediate,2,Control,"""Open""",1,0
+7/9/2019,3',Intermediate,2,Control,"""Rabbitbrush""",1,0
+7/9/2019,4',Intermediate,2,Total,"""Under Oak""",1,0
+7/9/2019,5',Intermediate,2,Total,"""Open""",1,0
+7/9/2019,6',Intermediate,2,Total,"""Rabbitbrush""",1,0
+7/9/2019,7',Intermediate,2,Partial,"""Under Oak""",1,0
+7/9/2019,8',Intermediate,2,Partial,"""Open""",1,0
+7/23/2019,1,Intermediate,1,Control,"""Under Oak""",1,1
+7/23/2019,2,Intermediate,1,Control,"""Open""",0,1
+7/23/2019,3,Intermediate,1,Control,"""Rabbitbrush""",1,1
+7/23/2019,4,Intermediate,1,Total,"""Under Oak""",1,1
+7/23/2019,5,Intermediate,1,Total,"""Open""",0,1
+7/23/2019,6,Intermediate,1,Total,"""Rabbitbrush""",1,1
+7/23/2019,7,Intermediate,1,Partial,"""Under Oak""",1,1
+7/23/2019,8,Intermediate,1,Partial,"""Open""",1,1
+7/23/2019,9,Intermediate,1,Partial,"""Rabbitbrush""",1,1
+7/23/2019,1',Intermediate,2,Control,"""Under Oak""",1,1
+7/23/2019,2',Intermediate,2,Control,"""Open""",1,1
+7/23/2019,3',Intermediate,2,Control,"""Rabbitbrush""",1,1
+7/23/2019,4',Intermediate,2,Total,"""Under Oak""",1,1
+7/23/2019,5',Intermediate,2,Total,"""Open""",1,1
+7/23/2019,6',Intermediate,2,Total,"""Rabbitbrush""",1,1
+7/23/2019,7',Intermediate,2,Partial,"""Under Oak""",1,1
+7/23/2019,8',Intermediate,2,Partial,"""Open""",1,1
+8/13/2019,1,Intermediate,1,Control,"""Under Oak""",0,2
+8/13/2019,2,Intermediate,1,Control,"""Open""",0,2
+8/13/2019,3,Intermediate,1,Control,"""Rabbitbrush""",0,2
+8/13/2019,4,Intermediate,1,Total,"""Under Oak""",0,2
+8/13/2019,5,Intermediate,1,Total,"""Open""",1,2
+8/13/2019,6,Intermediate,1,Total,"""Rabbitbrush""",1,2
+8/13/2019,7,Intermediate,1,Partial,"""Under Oak""",1,2
+8/13/2019,8,Intermediate,1,Partial,"""Open""",0,2
+8/13/2019,9,Intermediate,1,Partial,"""Rabbitbrush""",1,2
+8/13/2019,1',Intermediate,2,Control,"""Under Oak""",1,2
+8/13/2019,2',Intermediate,2,Control,"""Open""",1,2
+8/13/2019,3',Intermediate,2,Control,"""Rabbitbrush""",1,2
+8/13/2019,4',Intermediate,2,Total,"""Under Oak""",1,2
+8/13/2019,5',Intermediate,2,Total,"""Open""",1,2
+8/13/2019,6',Intermediate,2,Total,"""Rabbitbrush""",0,2
+8/13/2019,7',Intermediate,2,Partial,"""Under Oak""",1,2
+8/13/2019,8',Intermediate,2,Partial,"""Open""",1,2
+8/22/2019,1,Intermediate,1,Control,"""Under Oak""",0,3
+8/22/2019,2,Intermediate,1,Control,"""Open""",0,3
+8/22/2019,3,Intermediate,1,Control,"""Rabbitbrush""",0,3
+8/22/2019,4,Intermediate,1,Total,"""Under Oak""",0,3
+8/22/2019,5,Intermediate,1,Total,"""Open""",0,3
+8/22/2019,6,Intermediate,1,Total,"""Rabbitbrush""",0,3
+8/22/2019,7,Intermediate,1,Partial,"""Under Oak""",0,3
+8/22/2019,8,Intermediate,1,Partial,"""Open""",0,3
+8/22/2019,9,Intermediate,1,Partial,"""Rabbitbrush""",0,3
+8/22/2019,1',Intermediate,2,Control,"""Under Oak""",0,3
+8/22/2019,2',Intermediate,2,Control,"""Open""",1,3
+8/22/2019,3',Intermediate,2,Control,"""Rabbitbrush""",1,3
+8/22/2019,4',Intermediate,2,Total,"""Under Oak""",0,3
+8/22/2019,5',Intermediate,2,Total,"""Open""",0,3
+8/22/2019,6',Intermediate,2,Total,"""Rabbitbrush""",0,3
+8/22/2019,7',Intermediate,2,Partial,"""Under Oak""",1,3
+8/22/2019,8',Intermediate,2,Partial,"""Open""",0,3
+9/5/2019,1,Intermediate,1,Control,"""Under Oak""",0,4
+9/5/2019,2,Intermediate,1,Control,"""Open""",0,4
+9/5/2019,3,Intermediate,1,Control,"""Rabbitbrush""",0,4
+9/5/2019,4,Intermediate,1,Total,"""Under Oak""",0,4
+9/5/2019,5,Intermediate,1,Total,"""Open""",0,4
+9/5/2019,6,Intermediate,1,Total,"""Rabbitbrush""",0,4
+9/5/2019,7,Intermediate,1,Partial,"""Under Oak""",0,4
+9/5/2019,8,Intermediate,1,Partial,"""Open""",0,4
+9/5/2019,9,Intermediate,1,Partial,"""Rabbitbrush""",0,4
+9/5/2019,1',Intermediate,2,Control,"""Under Oak""",0,4
+9/5/2019,2',Intermediate,2,Control,"""Open""",0,4
+9/5/2019,3',Intermediate,2,Control,"""Rabbitbrush""",0,4
+9/5/2019,4',Intermediate,2,Total,"""Under Oak""",0,4
+9/5/2019,5',Intermediate,2,Total,"""Open""",0,4
+9/5/2019,6',Intermediate,2,Total,"""Rabbitbrush""",0,4
+9/5/2019,7',Intermediate,2,Partial,"""Under Oak""",1,4
+9/5/2019,8',Intermediate,2,Partial,"""Open""",0,4
