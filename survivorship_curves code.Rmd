@@ -1,0 +1,818 @@
+---
+title: "tick survivorship plots"
+author: "Devyn Orr, modified from An Bui"
+date: "2/12/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## 0. Set up
+```{r}
+library(tidyverse)
+library(here)
+library(lubridate)
+library(janitor)
+library(rlang)
+library(lubridate)
+library(wesanderson)
+```
+
+```{r}
+tick18 <- read_csv(here::here("data", "tick18_complete.csv")) %>% 
+  clean_names() %>% 
+  select(-deployment_date)
+
+tick2018 <- read_csv(here::here("data", "tick2018.csv")) %>% 
+  select(-X10)
+
+tick19 <- read_csv(here::here("data", "tick2019.csv"))
+```
+
+```{r}
+# plot function
+surv_curve <- function(dataframe, facet.by) {
+  ggplot(dataframe, aes(x = date_alive, y = mean_alive, col = shade, shape = shade)) +
+    geom_point(size = 3, alpha = 0.9) +
+    geom_line(size = 1, alpha = 0.8) +
+    geom_errorbar(aes(ymin = mean_alive - err_alive, ymax = mean_alive + err_alive)) +
+    scale_color_manual(values = c("darkgoldenrod1", "chocolate1", "chartreuse4")) +
+    facet_wrap(~ {{ facet.by }}) +
+    theme(plot.background = element_rect("white"),
+          panel.background = element_rect("white"),
+          panel.grid = element_line("grey93"),
+          axis.line = element_line("gray25"),
+          axis.text = element_text(size = 12, color = "gray25"),
+          axis.title = element_text(color = "gray25"),
+          legend.text = element_text(size = 12),
+          legend.title = element_text(size = 12)) +
+    labs(x = "Date",
+         y = "Mean number of ticks alive",
+         col = "Cage location",
+         shape = "Cage location")
+}
+```
+
+## 1. with tick18_complete.csv
+
+### cleaning up
+```{r}
+# cleaning up further
+tick18_clean <- tick18 %>% 
+  # get rid of duplicate rows
+  distinct() %>% 
+  # add in starting population to calculate proportion down the line
+  mutate(starting_pop = 40, 
+         # change site and treatment labels
+         site = case_when(
+           site == "ARID" ~ "Arid",
+           site == "INTERM" ~ "Intermediate",
+           site == "MESIC" ~ "Mesic"),
+         plot = case_when(
+           plot == "O" ~ "Total exclosure",
+           plot == "WC" ~ "Open (control)", 
+           plot == "W" ~ "Partial"),
+         # locations of cages within plots
+         shade = case_when(
+           cage_id = str_detect(cage_id, "O1") ~ "under tree",
+           cage_id = str_detect(cage_id, "WC1") ~ "under tree",
+           cage_id = str_detect(cage_id, "W1") ~ "under tree",
+           cage_id = str_detect(cage_id, "O2") ~ "partial shade",
+           cage_id = str_detect(cage_id, "WC2") ~ "partial shade",
+           cage_id = str_detect(cage_id, "W2") ~ "partial shade",
+           cage_id = str_detect(cage_id, "O3") ~ "least shade",
+           cage_id = str_detect(cage_id, "WC3") ~ "least shade",
+           cage_id = str_detect(cage_id, "W3") ~ "least shade"))
+```
+
+```{r}
+tick18_new <- tick18_clean %>% 
+  select(-date_alive, -num_alive, -num_dead) %>% 
+  distinct() %>% 
+  mutate(date_alive = as.Date("2018-07-28"),
+         num_alive = 40,
+         num_dead = 0) %>% 
+  bind_rows(tick18_clean, .) %>% 
+  mutate(plot = fct_relevel(plot, c("Open (control)", "Partial", "Total exclosure")))
+```
+
+
+### DEVA
+```{r}
+# new data frame for DEVA
+deva <- tick18_new %>% 
+  # only DEVA
+  filter(species == "DEVA") %>%
+  # calculate proportion alive (starting_pop = 40)
+  mutate(prop_alive = num_alive/starting_pop) %>% 
+  # calculate summary statistics
+  group_by(site, shade, date_alive) %>% 
+  summarize(total_alive = sum(num_alive),
+            total_dead = sum(num_dead),
+            mean_alive = mean(num_alive),
+            err_alive = sd(num_alive)/sqrt(9),
+            mean_prop_alive = mean(prop_alive),
+            err_prop_alive = sd(prop_alive)/sqrt(9),
+            n = length(shade))
+
+deva_plot <- ggplot(deva, aes(x = date_alive, y = mean_alive, col = shade, shape = shade)) +
+    geom_point(size = 3, alpha = 0.9) +
+    geom_line(size = 1, alpha = 0.8) +
+    geom_errorbar(aes(ymin = mean_alive - err_alive, ymax = mean_alive + err_alive)) +
+    scale_color_manual(values = wes_palette(name = "GrandBudapest1", n = 3, type = "continuous")) +
+    facet_grid(~site) +
+    theme(plot.background = element_rect("white"),
+          panel.background = element_rect("white"),
+          panel.grid = element_line("grey93"),
+          axis.line = element_line("gray25"),
+          axis.text = element_text(size = 12, color = "gray25"),
+          axis.title = element_text(color = "gray25"),
+          legend.text = element_text(size = 12),
+          legend.title = element_text(size = 12)) +
+    labs(x = "Date",
+         y = "Mean number of ticks alive",
+         col = "Cage location",
+         shape = "Cage location") +
+  labs(title = "DEVA (2018)")
+
+deva_plot
+
+# ggsave(here::here("figures", "2018-deva.jpg"), deva_plot, width = 7, height = 4)
+```
+
+```{r}
+CI.plot <- function(dataframe) {
+  ggplot(dataframe, aes(x = date_alive, y = mean_alive)) +
+  geom_point() +
+  geom_smooth(aes(col = plot), method = lm, se = TRUE, fill = "grey85") +
+  scale_color_manual(values = wes_palette(name = "GrandBudapest1", n = 3, type = "discrete")) +
+  facet_grid(~plot) +
+  labs(x = "Date", y = "Mean number ticks alive") +
+    theme(panel.background = element_rect("white"),
+        panel.grid = element_line("grey95"),
+        panel.border = element_rect("grey85", fill = NA),
+        legend.background = element_rect("white"),
+        legend.key = element_blank(),
+        strip.background = element_rect("grey85"))
+}
+
+EB.plot <- function(dataframe) {
+  ggplot(dataframe, aes(x = date_alive, y = mean_alive)) +
+  geom_path(alpha = 0.3) +
+  geom_errorbar(aes(x = date_alive, ymin = mean_alive - err_alive, ymax = mean_alive + err_alive), col = "grey25") +
+  geom_point(aes(col = plot), size = 4) +
+  scale_color_manual(values = wes_palette(name = "GrandBudapest1", n = 3, type = "discrete")) +
+  facet_grid(~plot) +
+  labs(x = "Date alive", y = "Mean number ticks alive", color = "Plot") +
+  theme(panel.background = element_rect("white"),
+        panel.grid = element_line("grey95"),
+        panel.border = element_rect("grey85", fill = NA),
+        legend.background = element_rect("white"),
+        legend.key = element_blank(),
+        strip.background = element_rect("grey85")
+        )
+}
+```
+
+
+```{r deva-sites-combined}
+# deva sites combined
+deva_sc <- tick18_new %>% 
+  filter(species == "DEVA") %>% 
+  group_by(date_alive, plot) %>% 
+  summarize(total_alive = sum(num_alive),
+            total_dead = sum(num_dead),
+            mean_alive = mean(num_alive),
+            err_alive = sd(num_alive)/sqrt(length(num_alive))) %>% 
+  # take out row with weird count
+  ungroup() %>% 
+  slice(-25)
+  
+deva_sc_CIplot <- CI.plot(deva_sc)
+
+deva_sc_CIplot
+
+
+
+deva_sc_EBplot <- EB.plot(deva_sc)
+
+deva_sc_EBplot
+
+# ggsave(here::here("figures", "deva-sites_combined-EB_plot.jpg"), deva_sc_EBplot, width = 7, height = 4)
+```
+
+```{r}
+CI.plot.ss <- function(dataframe) {
+  ggplot(dataframe, aes(x = date_alive, y = mean_alive, color = site)) +
+  geom_point() +
+  scale_color_manual(values = c("firebrick3", "goldenrod1", "deepskyblue3")) +
+  geom_smooth(method = lm, se = TRUE, fill = "grey85") +
+  facet_grid(~plot) +
+  labs(x = "Date", y = "Mean number ticks alive") +
+    theme(panel.background = element_rect("white"),
+        panel.grid = element_line("grey95"),
+        panel.border = element_rect("grey85", fill = NA),
+        legend.background = element_rect("white"),
+        legend.key = element_blank(),
+        strip.background = element_rect("grey85"))
+}
+
+EB.plot.ss <- function(dataframe) {
+  ggplot(dataframe, aes(x = date_alive, y = mean_alive, color = site)) +
+  geom_path(alpha = 0.5) +
+  geom_errorbar(aes(x = date_alive, ymin = mean_alive - err_alive, ymax = mean_alive + err_alive), col = "grey25") +
+  geom_point(size = 2) +
+  scale_color_manual(values = c("firebrick3", "goldenrod1", "deepskyblue3")) +
+  facet_grid(~plot) +
+  labs(x = "Date alive", y = "Mean number ticks alive", shape = "Site") +
+  theme(panel.background = element_rect("white"),
+        panel.grid = element_line("grey95"),
+        panel.border = element_rect("grey85", fill = NA),
+        legend.background = element_rect("white"),
+        legend.key = element_blank(),
+        strip.background = element_rect("grey85"))
+}
+```
+
+```{r deva-sites-separate}
+deva_ss <- tick18_new %>% 
+  # only DEVA
+  filter(species == "DEVA") %>%
+  # calculate proportion alive (starting_pop = 40)
+  mutate(prop_alive = num_alive/starting_pop) %>% 
+  group_by(date_alive, site, plot) %>% 
+  summarize(total_alive = sum(num_alive),
+            total_dead = sum(num_dead),
+            mean_alive = mean(num_alive),
+            err_alive = sd(num_alive)/sqrt(length(num_alive))) %>% 
+  # take out row with weird count
+  ungroup() %>% 
+  slice(-74, -82, -80)
+
+deva_ss_CIplot <- CI.plot.ss(deva_ss)
+
+deva_ss_CIplot
+
+deva_ss_EBplot <- EB.plot.ss(deva_ss)
+
+deva_ss_EBplot
+```
+
+### IXPA
+```{r}
+# IXPA data frame
+ixpa <- tick18_new %>% 
+  filter(species == "IXPA") %>% 
+  group_by(date_alive, site, shade) %>% 
+  summarize(total_alive = sum(num_alive),
+            total_dead = sum(num_dead),
+            mean_alive = mean(num_alive),
+            n = length(shade),
+            err_alive = sd(num_alive)/sqrt(n))
+
+ixpa_plot <- surv_curve(ixpa, ixpa$site) +
+  labs(title = "IXPA (2018)")
+
+ixpa_plot
+
+# ggsave(here::here("figures", "2018-ixpa.jpg"), ixpa_plot, width = 7, height = 4)
+```
+
+```{r ixpa-sites-combined}
+# ixpa sites combined
+ixpa_sc <- tick18_new %>% 
+  filter(species == "IXPA") %>% 
+  group_by(date_alive, plot) %>% 
+  summarize(total_alive = sum(num_alive),
+            total_dead = sum(num_dead),
+            mean_alive = mean(num_alive),
+            err_alive = sd(num_alive)/sqrt(length(num_alive))) %>% 
+  # take out row with weird count
+  ungroup() %>% 
+  slice(-10, -27)
+
+ixpa_sc_CIplot <- CI.plot(ixpa_sc)
+
+ixpa_sc_CIplot
+
+ixpa_sc_EBplot <- EB.plot(ixpa_sc)
+
+ixpa_sc_EBplot
+```
+
+```{r ixpa-sites-separate}
+ixpa_ss <- tick18_new %>% 
+  # only ixpa
+  filter(species == "IXPA") %>%
+  # calculate proportion alive (starting_pop = 40)
+  mutate(prop_alive = num_alive/starting_pop) %>% 
+  group_by(date_alive, site, plot) %>% 
+  summarize(total_alive = sum(num_alive),
+            total_dead = sum(num_dead),
+            mean_alive = mean(num_alive),
+            err_alive = sd(num_alive)/sqrt(length(num_alive))) %>% 
+  # take out row with weird count
+  ungroup() %>% 
+  slice(-55, -56, -62, -72)
+
+ixpa_ss_CIplot <- CI.plot.ss(ixpa_ss)
+
+ixpa_ss_CIplot
+
+ixpa_ss_EBplot <- EB.plot.ss(ixpa_ss)
+
+ixpa_ss_EBplot
+```
+
+```{r}
+datestamp <- format(Sys.Date())
+
+ggsave(here::here("figures", paste("deva-sites_combined-CI_plot-", datestamp, ".jpg", sep = "")), deva_sc_CIplot, width = 7, height = 4)
+
+ggsave(here::here("figures", paste("deva-sites_combined-EB_plot-", datestamp, ".jpg", sep = "")), deva_sc_EBplot, width = 7, height = 4)
+
+ggsave(here::here("figures", paste("deva-sites_separate-CI_plot-", datestamp, ".jpg", sep = "")), deva_ss_CIplot, width = 7, height = 4)
+
+ggsave(here::here("figures", paste("deva-sites_separate-EB_plot-", datestamp, ".jpg", sep = "")), deva_ss_EBplot, width = 7, height = 4)
+
+ggsave(here::here("figures", paste("ixpa-sites_combined-CI_plot-", datestamp, ".jpg", sep = "")), ixpa_sc_CIplot, width = 7, height = 4)
+
+ggsave(here::here("figures", paste("ixpa-sites_combined-EB_plot-", datestamp, ".jpg", sep = "")), ixpa_sc_EBplot, width = 7, height = 4)
+
+ggsave(here::here("figures", paste("ixpa-sites_separate-CI_plot-", datestamp, ".jpg", sep = "")), ixpa_ss_CIplot, width = 7, height = 4)
+
+ggsave(here::here("figures", paste("ixpa-sites_separate-EB_plot-", datestamp, ".jpg", sep = "")), ixpa_ss_EBplot, width = 7, height = 4)
+```
+
+
+## 2. with tick2018.csv
+
+### cleaning up
+```{r}
+tick2018_new <- tick2018 %>% 
+  # make sure dates are clean
+  # mutate(date = mdy(date))
+  # recode location of cages in plot and death_t_f
+ mutate(death_t_f = case_when(
+      death_t_f == 0 ~ "TRUE",
+      death_t_f == 1 ~ "FALSE"),
+      
+      shade = case_when(
+    cage_ID = str_detect(cage_ID, "O1") ~ "under tree",
+    cage_ID = str_detect(cage_ID, "WC1") ~ "under tree",
+    cage_ID = str_detect(cage_ID, "W1") ~ "under tree",
+    cage_ID = str_detect(cage_ID, "O2") ~ "partial shade",
+    cage_ID = str_detect(cage_ID, "WC2") ~ "partial shade",
+    cage_ID = str_detect(cage_ID, "W2") ~ "partial shade",
+    cage_ID = str_detect(cage_ID, "O3") ~ "least shade",
+    cage_ID = str_detect(cage_ID, "WC3") ~ "least shade",
+    cage_ID = str_detect(cage_ID, "W3") ~ "least shade"),
+    
+    plot = case_when(
+      plot == "total" ~ "Total exclosure",
+      plot == "Total" ~ "Total exclosure",
+      plot == "partial" ~ "Partial",
+      plot == "Partial" ~ "Partial",
+      plot == "open" ~ "Open (control)",
+      plot == "Control" ~ "Open (control)"),
+    
+    plot = fct_relevel(plot, "Open (control)", "Partial", "Total exclosure"))
+```
+
+### DEVA
+```{r}
+deva_tick2018 <- tick2018_new %>% 
+  filter(Species == "DEVA") %>% 
+  group_by(site, shade, date, cage_ID, death_t_f) %>% 
+  summarize(total_dead = length(death_t_f)) %>% 
+  pivot_wider(names_from = death_t_f, values_from = total_dead) %>% 
+  rename("alive" = "FALSE", "dead" = "TRUE") %>% 
+  ungroup()
+
+deva_tick2018_sum <- deva_tick2018 %>% 
+  group_by(date, site, shade) %>% 
+  summarize(mean_alive = mean(alive),
+            err_alive = sd(alive)/sqrt(9))
+  
+deva_tick2018_plot <- ggplot(deva_tick2018_sum, aes(x = date, y = mean_alive, col = shade)) +
+  geom_point(size = 3, alpha = 0.8) +
+  geom_errorbar(aes(ymin = mean_alive - err_alive, ymax = mean_alive + err_alive)) +
+  geom_line(size = 1, alpha = 0.8) +
+  facet_wrap(~site) +
+  labs(title = "DEVA")
+
+deva_tick2018_plot
+```
+
+## 3. by treatment
+### DEVA
+```{r}
+deva_t <- tick18_new %>% 
+  # only DEVA
+  filter(species == "DEVA") %>%
+  # calculate proportion alive (starting_pop = 40)
+  mutate(prop_alive = num_alive/starting_pop) %>% 
+  # calculate summary statistics
+  group_by(date_alive, site, plot, shade) %>% 
+  summarize(mean_alive = mean(num_alive),
+            err_alive = sd(num_alive)/sqrt(9),
+            mean_prop_alive = mean(prop_alive),
+            err_prop_alive = sd(prop_alive)/sqrt(9),
+            sum_alive = sum(num_alive)) %>% 
+  filter(site == "Arid" & plot == "Partial")
+```
+
+#### arid
+```{r}
+deva_arid_wo <- tick18_new %>% 
+  filter(species == "DEVA" & site == "Arid" & plot == "Partial")
+
+deva_arid <- deva_t %>% 
+  filter(site == "Arid")
+
+deva_arid_plot <- surv_curve(deva_arid, deva_arid$plot) +
+  labs(title = "DEVA - Arid sites (2018)")
+
+deva_arid_plot
+
+# ggsave(here::here("figures", "2018-deva_arid.jpg"), deva_arid_plot, width = 7, height = 4)
+```
+
+#### intermediate
+```{r}
+deva_int <- deva_t %>% 
+  filter(site == "Intermediate")
+
+deva_int_plot <- surv_curve(deva_int, deva_int$plot) +
+  labs(title = "DEVA - Intermediate sites (2018)")
+
+deva_int_plot
+
+# ggsave(here::here("figures", "2018-deva_int.jpg"), deva_int_plot, width = 7, height = 4)
+```
+
+#### mesic
+```{r}
+deva_mes <- deva_t %>% 
+  filter(site == "Mesic")
+
+deva_mes_plot <- surv_curve(deva_mes, deva_mes$plot) +
+  labs(title = "DEVA - Mesic sites (2018)")
+
+deva_mes_plot
+# some weird points here - Devyn, maybe take another look at these counts?
+
+# ggsave(here::here("figures", "2018-deva_mes.jpg"), deva_mes_plot, width = 7, height = 4)
+```
+
+### IXPA
+
+```{r}
+ixpa_t <- tick18_new %>% 
+  # only IXPA
+  filter(species == "IXPA") %>%
+  # calculate proportion alive (starting_pop = 40)
+  mutate(prop_alive = num_alive/starting_pop) %>% 
+  # calculate summary statistics
+  group_by(date_alive, site, plot, shade) %>% 
+  summarize(mean_alive = mean(num_alive),
+            err_alive = sd(num_alive)/sqrt(9),
+            mean_prop_alive = mean(prop_alive),
+            err_prop_alive = sd(prop_alive)/sqrt(9))
+```
+
+#### arid
+```{r}
+ixpa_arid <- ixpa_t %>% 
+  filter(site == "Arid")
+
+ixpa_arid_plot <- surv_curve(ixpa_arid, ixpa_arid$plot) +
+  labs(title = "IXPA - Arid sites (2018)")
+
+ixpa_arid_plot
+
+# ggsave(here::here("figures", "2018-ixpa_arid.jpg"), ixpa_arid_plot, width = 7, height = 4)
+```
+
+#### intermediate
+```{r}
+ixpa_int <- ixpa_t %>% 
+  filter(site == "Intermediate")
+
+ixpa_int_plot <- surv_curve(ixpa_int, ixpa_int$plot) +
+  labs(title = "IXPA - Intermediate sites (2018)")
+
+ixpa_int_plot
+
+# ggsave(here::here("figures", "2018-ixpa_int.jpg"), ixpa_int_plot, width = 7, height = 4)
+```
+
+#### mesic
+```{r}
+ixpa_mes <- ixpa_t %>% 
+  filter(site == "Mesic")
+
+ixpa_mes_plot <- surv_curve(ixpa_int, ixpa_int$plot) +
+  labs(title = "IXPA - Mesic sites (2018)")
+
+ixpa_mes_plot
+
+# ggsave(here::here("figures", "2018-ixpa_mes.jpg"), ixpa_mes_plot, width = 7, height = 4)
+```
+
+## 4. bar graphs by treatment
+
+```{r}
+surv_bar <- function(dataframe, facet.by) {
+  ggplot(dataframe, aes(x = date_alive, y = mean_alive, fill = shade)) +
+    geom_col(position = position_dodge()) +
+    geom_errorbar(aes(ymin = mean_alive - err_alive, ymax = mean_alive + err_alive), position = position_dodge()) +
+    scale_fill_manual(values = c("darkgoldenrod1", "chocolate1", "chartreuse4")) +
+    scale_y_continuous(expand = c(0, 0)) +
+    facet_wrap(~ {{ facet.by }}) +
+    theme(plot.background = element_rect("white"),
+          panel.background = element_rect("white"),
+          panel.grid = element_line("grey93"),
+          axis.line = element_line("gray25"),
+          axis.text = element_text(size = 12, color = "gray25"),
+          axis.title = element_text(color = "gray25"),
+          legend.text = element_text(size = 6),
+          legend.title = element_text(size = 6)) +
+    labs(x = "Date",
+         y = "Mean number of ticks alive",
+         col = "Cage location")
+}
+```
+
+### DEVA
+
+#### arid
+```{r}
+deva_arid_bar <- surv_bar(deva_arid, deva_arid$plot) +
+  labs(title = "DEVA - Arid sites (2018)")
+
+deva_arid_bar
+
+# ggsave(here::here("figures", "2018-deva_arid_bar.jpg"), width = 7, height = 4)
+```
+
+#### intermediate
+```{r}
+deva_int_bar <- surv_box(deva_int, deva_int$plot) +
+  labs(title = "DEVA - Intermediate sites (2018)")
+
+deva_int_bar
+
+# ggsave(here::here("figures", "2018-deva_int_bar.jpg"), width = 7, height = 4)
+```
+
+#### mesic
+```{r}
+deva_mes_bar <- surv_bar(deva_mes, deva_mes$plot) +
+  labs(title = "DEVA - Mesic sites (2018)")
+
+deva_mes_bar
+
+# ggsave(here::here("figures", "2018-deva_mes_bar.jpg"), width = 7, height = 4)
+```
+
+### IXPA
+
+#### arid
+```{r}
+ixpa_arid_bar <- surv_bar(ixpa_arid, ixpa_arid$plot) +
+  labs(title = "IXPA - Arid sites (2018)")
+
+ixpa_arid_bar
+
+# ggsave(here::here("figures", "2018-ixpa_arid_bar.jpg"), ixpa_arid_bar, width = 7, height = 4)
+```
+
+#### intermediate
+```{r}
+ixpa_int_bar <- surv_bar(ixpa_int, ixpa_int$plot) +
+  labs(title = "IXPA - Intermediate sites (2018)")
+
+ixpa_int_bar
+
+# ggsave(here::here("figures", "2018-ixpa_int_bar.jpg"), ixpa_int_bar, width = 7, height = 4)
+```
+
+#### mesic
+```{r}
+ixpa_mes_bar <- surv_bar(ixpa_mes, ixpa_mes$plot) +
+  labs(title = "IXPA - Mesic sites (2018)")
+
+ixpa_mes_bar
+
+# ggsave(here::here("figures", "2018-ixpa_mes_bar.jpg"), ixpa_mes_bar, width = 7, height = 4)
+```
+
+## 5. mean survival plots
+```{r}
+# steps to go through
+# death_t_f: 1 is alive, 0 is dead
+# tind start alive date
+tick3256_start <- tick2018 %>% 
+  clean_names() %>% 
+  group_by(species, tick_id) %>% 
+  filter(species == "DEVA" & tick_id == 3256 & death_t_f == 1) %>% 
+  pull(date) %>% 
+  first()
+
+# find last day alive
+tick3256_end <- tick2018 %>% 
+  clean_names() %>% 
+  group_by(species, tick_id) %>% 
+  filter(species == "DEVA" & tick_id == 3256 & death_t_f == 1) %>% 
+  pull(date) %>%
+  last()
+
+# calculate time alive
+tick3256_timealive <- time_length(interval(tick3256_start, tick3256_end), "day")
+```
+
+```{r}
+# for() loop for all DEVA
+deva_survival_df <- tick2018 %>% 
+  clean_names() %>% 
+  filter(species == "DEVA" & death_t_f == 1)
+
+deva_tickIDs <- deva_survival_df %>% 
+  pull(tick_id) %>% 
+  unique()
+
+deva_ticktimes <- list()
+
+for(i in 1:length(deva_tickIDs)){
+  tick_no <- deva_tickIDs[i]
+  
+  tick_no_dates <- deva_survival_df %>% 
+    filter(tick_id == tick_no) %>% 
+    pull(date)
+  
+  deva_tick_start <- tick_no_dates %>% 
+    first()
+  
+  deva_tick_end <- tick_no_dates %>% 
+    last()
+  
+  time_alive <-time_length(interval(deva_tick_start, deva_tick_end), "day")
+  
+  deva_ticktimes[i] <- time_alive
+}
+
+deva_timealive_df <- tibble(deva_tickIDs, deva_ticktimes)
+
+deva_timealive_final <- deva_survival_df %>% 
+  select(-date, -death_t_f, -experiment) %>% 
+  distinct() %>% 
+  full_join(., deva_timealive_df, by = c("tick_id" = "deva_tickIDs")) %>% 
+  unnest() %>% 
+  mutate(plot = case_when(
+      plot == "total" ~ "Total exclosure",
+      plot == "Total" ~ "Total exclosure",
+      plot == "partial" ~ "Partial",
+      plot == "Partial" ~ "Partial",
+      plot == "open" ~ "Open (control)",
+      plot == "Control" ~ "Open (control)"),
+      
+      plot = fct_relevel(plot, "Open (control)", "Partial", "Total exclosure"))
+```
+
+```{r}
+# boxplot
+deva_surv_boxplot <- ggplot(deva_timealive_final, aes(x = site, y = deva_ticktimes, col = plot)) +
+  geom_boxplot(outlier.color = "black") +
+  scale_color_manual(values = wes_palette(name = "GrandBudapest1", n = 3, type = "discrete")) +
+  labs(x = "Site", y = "Tick survival times (days)", col = "Plot") +
+  theme(panel.background = element_rect("white"),
+        panel.grid = element_line("grey95"),
+        panel.border = element_rect("grey85", fill = NA),
+        legend.background = element_rect("white"),
+        legend.key = element_blank())
+
+deva_surv_boxplot
+
+# old colors
+# "#EEB736", "#F7876B", "#27706B"
+
+# summary plot
+deva_timealive_summary <- deva_timealive_final %>% 
+  group_by(site, plot) %>% 
+  summarise(mean_surv = mean(deva_ticktimes),
+            err_surv = sd(deva_ticktimes)/sqrt(length(deva_ticktimes)))
+
+deva_surv_bar <- ggplot(deva_timealive_summary, aes(x = site, y = mean_surv, fill = plot)) +
+  geom_col(color = "black", position = "dodge", width = 0.9) +
+  scale_fill_manual(values = wes_palette(name = "GrandBudapest1", n = 3, type = "discrete")) +
+  geom_errorbar(aes(ymin = mean_surv - err_surv, ymax = mean_surv + err_surv), width = 0.5, position = position_dodge(width = 0.9)) +
+  labs(x = "Site", y = "Mean tick survival time (days)", fill = "Plot") +
+  scale_y_continuous(expand = c(0, 0), limits = c(0, 38)) +  
+  theme(panel.background = element_rect("white"),
+        panel.grid = element_line("grey95"),
+        panel.border = element_rect("grey85", fill = NA),
+        legend.background = element_rect("white"),
+        legend.key = element_blank(),
+        strip.background = element_rect("grey85"))
+
+deva_surv_bar
+```
+
+```{r}
+# for() loop for all ixpa
+ixpa_survival_df <- tick2018 %>% 
+  clean_names() %>% 
+  filter(species == "IXPA" & death_t_f == 1)
+
+ixpa_tickIDs <- ixpa_survival_df %>% 
+  pull(tick_id) %>% 
+  unique()
+
+ixpa_ticktimes <- list()
+
+for(i in 1:length(ixpa_tickIDs)){
+  tick_no <- ixpa_tickIDs[i]
+  
+  tick_no_dates <- ixpa_survival_df %>% 
+    filter(tick_id == tick_no) %>% 
+    pull(date)
+  
+  ixpa_tick_start <- tick_no_dates %>% 
+    first()
+  
+  ixpa_tick_end <- tick_no_dates %>% 
+    last()
+  
+  time_alive <-time_length(interval(ixpa_tick_start, ixpa_tick_end), "day")
+  
+  ixpa_ticktimes[i] <- time_alive
+}
+
+ixpa_timealive_df <- tibble(ixpa_tickIDs, ixpa_ticktimes)
+
+ixpa_timealive_final <- ixpa_survival_df %>% 
+  select(-date, -death_t_f, -experiment) %>% 
+  distinct() %>% 
+  full_join(., ixpa_timealive_df, by = c("tick_id" = "ixpa_tickIDs")) %>% 
+  unnest() %>% 
+  mutate(plot = case_when(
+      plot == "total" ~ "Total exclosure",
+      plot == "Total" ~ "Total exclosure",
+      plot == "partial" ~ "Partial",
+      plot == "Partial" ~ "Partial",
+      plot == "open" ~ "Open (control)",
+      plot == "Control" ~ "Open (control)"),
+      
+      plot = fct_relevel(plot, "Open (control)", "Partial", "Total exclosure"))
+```
+
+```{r}
+# boxplot
+ixpa_surv_boxplot <- ggplot(ixpa_timealive_final, aes(x = site, y = ixpa_ticktimes, col = plot)) +
+  geom_boxplot(outlier.color = "black") +
+  scale_color_manual(values = wes_palette(name = "GrandBudapest1", n = 3, type = "discrete")) +
+  labs(x = "Site", y = "Tick survival times (days)", col = "Plot") +
+  theme(panel.background = element_rect("white"),
+        panel.grid = element_line("grey95"),
+        panel.border = element_rect("grey85", fill = NA),
+        legend.background = element_rect("white"),
+        legend.key = element_blank())
+
+ixpa_surv_boxplot
+
+# summary plot
+ixpa_timealive_summary <- ixpa_timealive_final %>% 
+  group_by(site, plot) %>% 
+  summarise(mean_surv = mean(ixpa_ticktimes),
+            err_surv = sd(ixpa_ticktimes)/sqrt(length(ixpa_ticktimes)))
+
+ixpa_surv_bar <- ggplot(ixpa_timealive_summary, aes(x = site, y = mean_surv, fill = plot)) +
+  geom_col(color = "black", position = "dodge", width = 0.9) +
+  scale_fill_manual(values = wes_palette(name = "GrandBudapest1", n = 3, type = "discrete")) +
+  geom_errorbar(aes(ymin = mean_surv - err_surv, ymax = mean_surv + err_surv), width = 0.5, position = position_dodge(width = 0.9)) +
+  labs(x = "Site", y = "Mean tick survival time (days)", fill = "Plot") +
+  scale_y_continuous(expand = c(0, 0), limits = c(0, 40)) +  
+  theme(panel.background = element_rect("white"),
+        panel.grid = element_line("grey95"),
+        panel.border = element_rect("grey85", fill = NA),
+        legend.background = element_rect("white"),
+        legend.key = element_blank(),
+        strip.background = element_rect("grey85"))
+
+ixpa_surv_bar
+```
+
+```{r}
+ggsave(here::here("figures", paste("deva-mean_survival-boxplot-", datestamp, ".jpg", sep = "")), deva_surv_boxplot, width = 7, height = 4)
+
+ggsave(here::here("figures", paste("deva-mean_survival-barplot-", datestamp, ".jpg", sep = "")), deva_surv_bar, width = 7, height = 4)
+
+ggsave(here::here("figures", paste("ixpa-mean_survival-boxplot-", datestamp, ".jpg", sep = "")), ixpa_surv_boxplot, width = 7, height = 4)
+
+ggsave(here::here("figures", paste("ixpa-mean_survival-barplot-", datestamp, ".jpg", sep = "")), ixpa_surv_bar, width = 7, height = 4)
+```
+
+

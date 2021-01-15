@@ -1,0 +1,424 @@
+﻿Date,Survey_ID,Climate_Level,Treatment,Block,Plot_ID,Temp
+7/15/18,1,Arid,Open,1,ARO1,51.705
+7/19/18,2,Arid,Open,1,ARO1,50.61033
+7/22/18,3,Arid,Open,1,ARO1,47.75913
+7/29/18,4,Arid,Open,1,ARO1,44.24973
+7/31/18,5,Arid,Open,1,ARO1,45.4712
+8/6/18,6,Arid,Open,1,ARO1,48.51106
+8/9/18,7,Arid,Open,1,ARO1,43.58246
+8/12/18,8,Arid,Open,1,ARO1,44.16153
+8/19/18,9,Arid,Open,1,ARO1,45.81813
+8/22/18,10,Arid,Open,1,ARO1,46.03253
+8/26/18,11,Arid,Open,1,ARO1,42.95866
+9/1/18,12,Arid,Open,1,ARO1,44.05573
+9/3/18,13,Arid,Open,1,ARO1,43.89573
+9/11/18,14,Arid,Open,1,ARO1,43.9458
+9/16/18,15,Arid,Open,1,ARO1,43.69946
+9/21/18,16,Arid,Open,1,ARO1,42.69826
+9/25/18,17,Arid,Open,1,ARO1,37.68106
+9/29/18,18,Arid,Open,1,ARO1,33.01073
+10/4/18,19,Arid,Open,1,ARO1,34.8948
+10/7/18,20,Arid,Open,1,ARO1,39.9884
+10/18/18,21,Arid,Open,1,ARO1,35.31313
+10/21/18,22,Arid,Open,1,ARO1,29.7312
+10/23/18,23,Arid,Open,1,ARO1,28.5314
+11/3/18,24,Arid,Open,1,ARO1,27.11761
+7/15/18,1,Arid,Open,2,ARO2,52.89273
+7/19/18,2,Arid,Open,2,ARO2,51.84573
+7/22/18,3,Arid,Open,2,ARO2,48.91926
+7/29/18,4,Arid,Open,2,ARO2,46.245
+7/31/18,5,Arid,Open,2,ARO2,48.12986
+8/6/18,6,Arid,Open,2,ARO2,50.462
+8/9/18,7,Arid,Open,2,ARO2,45.6772
+8/12/18,8,Arid,Open,2,ARO2,46.95926
+8/19/18,9,Arid,Open,2,ARO2,49.27613
+8/22/18,10,Arid,Open,2,ARO2,48.9724
+8/26/18,11,Arid,Open,2,ARO2,46.4526
+9/1/18,12,Arid,Open,2,ARO2,47.69186
+9/3/18,13,Arid,Open,2,ARO2,48.10866
+9/11/18,14,Arid,Open,2,ARO2,47.83386
+9/16/18,15,Arid,Open,2,ARO2,47.73053
+9/21/18,16,Arid,Open,2,ARO2,46.38053
+9/25/18,17,Arid,Open,2,ARO2,42.345
+9/29/18,18,Arid,Open,2,ARO2,37.38533
+10/4/18,19,Arid,Open,2,ARO2,40.1248
+10/7/18,20,Arid,Open,2,ARO2,44.67793
+10/18/18,21,Arid,Open,2,ARO2,40.62193
+10/21/18,22,Arid,Open,2,ARO2,35.5584
+10/23/18,23,Arid,Open,2,ARO2,35.23966
+11/3/18,24,Arid,Open,2,ARO2,33.11338
+7/15/18,1,Arid,Open,3,ARO3,53.54653
+7/19/18,2,Arid,Open,3,ARO3,52.17893
+7/22/18,3,Arid,Open,3,ARO3,48.41
+7/29/18,4,Arid,Open,3,ARO3,43.78093
+7/31/18,5,Arid,Open,3,ARO3,45.4274
+8/6/18,6,Arid,Open,3,ARO3,48.23733
+8/9/18,7,Arid,Open,3,ARO3,43.87433
+8/12/18,8,Arid,Open,3,ARO3,45.29873
+8/19/18,9,Arid,Open,3,ARO3,47.68953
+8/22/18,10,Arid,Open,3,ARO3,47.43006
+8/26/18,11,Arid,Open,3,ARO3,44.96506
+9/1/18,12,Arid,Open,3,ARO3,46.48126
+9/3/18,13,Arid,Open,3,ARO3,46.9344
+9/11/18,14,Arid,Open,3,ARO3,46.77353
+9/16/18,15,Arid,Open,3,ARO3,47.72573
+9/21/18,16,Arid,Open,3,ARO3,46.72273
+9/25/18,17,Arid,Open,3,ARO3,42.8092
+9/29/18,18,Arid,Open,3,ARO3,37.488
+10/4/18,19,Arid,Open,3,ARO3,40.75813
+10/7/18,20,Arid,Open,3,ARO3,45.38946
+10/18/18,21,Arid,Open,3,ARO3,41.3094
+10/21/18,22,Arid,Open,3,ARO3,35.92513
+10/23/18,23,Arid,Open,3,ARO3,34.60913
+11/3/18,24,Arid,Open,3,ARO3,32.6004
+7/15/18,1,Intermediate,Open,1,INO1,44.05126
+7/19/18,2,Intermediate,Open,1,INO1,50.15146
+7/22/18,3,Intermediate,Open,1,INO1,47.09766
+7/29/18,4,Intermediate,Open,1,INO1,45.86193
+7/31/18,5,Intermediate,Open,1,INO1,49.45853
+8/6/18,6,Intermediate,Open,1,INO1,48.08246
+8/9/18,7,Intermediate,Open,1,INO1,48.51406
+8/12/18,8,Intermediate,Open,1,INO1,50.7554
+8/19/18,9,Intermediate,Open,1,INO1,50.59493
+8/22/18,10,Intermediate,Open,1,INO1,46.20473
+8/26/18,11,Intermediate,Open,1,INO1,46.04173
+9/1/18,12,Intermediate,Open,1,INO1,47.5844
+9/3/18,13,Intermediate,Open,1,INO1,45.44146
+9/11/18,14,Intermediate,Open,1,INO1,40.96613
+9/16/18,15,Intermediate,Open,1,INO1,43.107
+9/21/18,16,Intermediate,Open,1,INO1,43.49733
+9/25/18,17,Intermediate,Open,1,INO1,41.99213
+9/29/18,18,Intermediate,Open,1,INO1,40.07093
+10/4/18,19,Intermediate,Open,1,INO1,42.34453
+10/7/18,20,Intermediate,Open,1,INO1,34.48646
+10/18/18,21,Intermediate,Open,1,INO1,32.416
+10/21/18,22,Intermediate,Open,1,INO1,34.81026
+10/23/18,23,Intermediate,Open,1,INO1,25.74413
+11/3/18,24,Intermediate,Open,1,INO1,19.8368
+7/15/18,1,Intermediate,Open,2,INO2,43.5752
+7/19/18,2,Intermediate,Open,2,INO2,48.28926
+7/22/18,3,Intermediate,Open,2,INO2,46.20193
+7/29/18,4,Intermediate,Open,2,INO2,45.56526
+7/31/18,5,Intermediate,Open,2,INO2,50.53913
+8/6/18,6,Intermediate,Open,2,INO2,49.9146
+8/9/18,7,Intermediate,Open,2,INO2,50.19846
+8/12/18,8,Intermediate,Open,2,INO2,52.4242
+8/19/18,9,Intermediate,Open,2,INO2,51.7572
+8/22/18,10,Intermediate,Open,2,INO2,48.71233
+8/26/18,11,Intermediate,Open,2,INO2,48.46893
+9/1/18,12,Intermediate,Open,2,INO2,49.22846
+9/3/18,13,Intermediate,Open,2,INO2,47.36093
+9/11/18,14,Intermediate,Open,2,INO2,43.6736
+9/16/18,15,Intermediate,Open,2,INO2,45.7558
+9/21/18,16,Intermediate,Open,2,INO2,45.50586
+9/25/18,17,Intermediate,Open,2,INO2,43.95826
+9/29/18,18,Intermediate,Open,2,INO2,41.07853
+10/4/18,19,Intermediate,Open,2,INO2,44.09533
+10/7/18,20,Intermediate,Open,2,INO2,36.58513
+10/18/18,21,Intermediate,Open,2,INO2,33.31153
+10/21/18,22,Intermediate,Open,2,INO2,35.80633
+10/23/18,23,Intermediate,Open,2,INO2,28.3404
+11/3/18,24,Intermediate,Open,2,INO2,21.6526
+7/15/18,1,Intermediate,Open,3,INO3,36.51326
+7/19/18,2,Intermediate,Open,3,INO3,41.81526
+7/22/18,3,Intermediate,Open,3,INO3,41.44266
+7/29/18,4,Intermediate,Open,3,INO3,38.83333
+7/31/18,5,Intermediate,Open,3,INO3,42.88613
+8/6/18,6,Intermediate,Open,3,INO3,41.0064
+8/9/18,7,Intermediate,Open,3,INO3,41.1904
+8/12/18,8,Intermediate,Open,3,INO3,44.84366
+8/19/18,9,Intermediate,Open,3,INO3,45.43366
+8/22/18,10,Intermediate,Open,3,INO3,41.67626
+8/26/18,11,Intermediate,Open,3,INO3,40.43353
+9/1/18,12,Intermediate,Open,3,INO3,42.71973
+9/3/18,13,Intermediate,Open,3,INO3,41.2556
+9/11/18,14,Intermediate,Open,3,INO3,38.0088
+9/16/18,15,Intermediate,Open,3,INO3,39.8224
+9/21/18,16,Intermediate,Open,3,INO3,40.30173
+9/25/18,17,Intermediate,Open,3,INO3,40.09773
+9/29/18,18,Intermediate,Open,3,INO3,37.73413
+10/4/18,19,Intermediate,Open,3,INO3,40.37633
+10/7/18,20,Intermediate,Open,3,INO3,32.0616
+10/18/18,21,Intermediate,Open,3,INO3,31.56546
+10/21/18,22,Intermediate,Open,3,INO3,32.61906
+10/23/18,23,Intermediate,Open,3,INO3,25.8678
+11/3/18,24,Intermediate,Open,3,INO3,19.38353
+7/15/18,1,Intermediate,Total,1,INT1,43.99806
+7/19/18,2,Intermediate,Total,1,INT1,49.74246
+7/22/18,3,Intermediate,Total,1,INT1,46.17333
+7/29/18,4,Intermediate,Total,1,INT1,45.04366
+7/31/18,5,Intermediate,Total,1,INT1,48.86866
+8/6/18,6,Intermediate,Total,1,INT1,46.80313
+8/9/18,7,Intermediate,Total,1,INT1,46.5356
+8/12/18,8,Intermediate,Total,1,INT1,50.41846
+8/19/18,9,Intermediate,Total,1,INT1,50.39953
+8/22/18,10,Intermediate,Total,1,INT1,45.58006
+8/26/18,11,Intermediate,Total,1,INT1,44.74613
+9/1/18,12,Intermediate,Total,1,INT1,46.8424
+9/3/18,13,Intermediate,Total,1,INT1,43.6394
+9/11/18,14,Intermediate,Total,1,INT1,38.49946
+9/16/18,15,Intermediate,Total,1,INT1,39.8872
+9/21/18,16,Intermediate,Total,1,INT1,39.01466
+9/25/18,17,Intermediate,Total,1,INT1,39.11673
+9/29/18,18,Intermediate,Total,1,INT1,36.67593
+10/4/18,19,Intermediate,Total,1,INT1,39.1326
+10/7/18,20,Intermediate,Total,1,INT1,30.22093
+10/18/18,21,Intermediate,Total,1,INT1,27.54066
+10/21/18,22,Intermediate,Total,1,INT1,28.46106
+10/23/18,23,Intermediate,Total,1,INT1,19.56366
+11/3/18,24,Intermediate,Total,1,INT1,15.00233
+7/15/18,1,Intermediate,Total,2,INT2,41.24986
+7/19/18,2,Intermediate,Total,2,INT2,47.7026
+7/22/18,3,Intermediate,Total,2,INT2,43.0512
+7/29/18,4,Intermediate,Total,2,INT2,43.60666
+7/31/18,5,Intermediate,Total,2,INT2,46.84986
+8/6/18,6,Intermediate,Total,2,INT2,44.42826
+8/9/18,7,Intermediate,Total,2,INT2,43.91133
+8/12/18,8,Intermediate,Total,2,INT2,47.35773
+8/19/18,9,Intermediate,Total,2,INT2,47.9344
+8/22/18,10,Intermediate,Total,2,INT2,43.29286
+8/26/18,11,Intermediate,Total,2,INT2,42.63826
+9/1/18,12,Intermediate,Total,2,INT2,45.08133
+9/3/18,13,Intermediate,Total,2,INT2,43.89413
+9/11/18,14,Intermediate,Total,2,INT2,38.5176
+9/16/18,15,Intermediate,Total,2,INT2,39.525
+9/21/18,16,Intermediate,Total,2,INT2,40.07946
+9/25/18,17,Intermediate,Total,2,INT2,39.78573
+9/29/18,18,Intermediate,Total,2,INT2,38.0458
+10/4/18,19,Intermediate,Total,2,INT2,40.6072
+10/7/18,20,Intermediate,Total,2,INT2,32.45546
+10/18/18,21,Intermediate,Total,2,INT2,28.5862
+10/21/18,22,Intermediate,Total,2,INT2,30.16053
+10/23/18,23,Intermediate,Total,2,INT2,21.81
+11/3/18,24,Intermediate,Total,2,INT2,15.16646
+7/15/18,1,Intermediate,Total,3,INT3,38.45306
+7/19/18,2,Intermediate,Total,3,INT3,44.11753
+7/22/18,3,Intermediate,Total,3,INT3,41.49833
+7/29/18,4,Intermediate,Total,3,INT3,39.982
+7/31/18,5,Intermediate,Total,3,INT3,45.021
+8/6/18,6,Intermediate,Total,3,INT3,42.97293
+8/9/18,7,Intermediate,Total,3,INT3,43.13666
+8/12/18,8,Intermediate,Total,3,INT3,45.25426
+8/19/18,9,Intermediate,Total,3,INT3,45.16786
+8/22/18,10,Intermediate,Total,3,INT3,42.2614
+8/26/18,11,Intermediate,Total,3,INT3,41.42946
+9/1/18,12,Intermediate,Total,3,INT3,43.12393
+9/3/18,13,Intermediate,Total,3,INT3,41.63093
+9/11/18,14,Intermediate,Total,3,INT3,36.7276
+9/16/18,15,Intermediate,Total,3,INT3,37.23293
+9/21/18,16,Intermediate,Total,3,INT3,38.33953
+9/25/18,17,Intermediate,Total,3,INT3,38.15593
+9/29/18,18,Intermediate,Total,3,INT3,34.93133
+10/4/18,19,Intermediate,Total,3,INT3,38.79606
+10/7/18,20,Intermediate,Total,3,INT3,29.60186
+10/18/18,21,Intermediate,Total,3,INT3,26.87053
+10/21/18,22,Intermediate,Total,3,INT3,29.24473
+10/23/18,23,Intermediate,Total,3,INT3,20.15346
+11/3/18,24,Intermediate,Total,3,INT3,14.40326
+7/15/18,1,Intermediate,Partial,1,INP1,32.70246
+7/19/18,2,Intermediate,Partial,1,INP1,38.63653
+7/22/18,3,Intermediate,Partial,1,INP1,36.7438
+7/29/18,4,Intermediate,Partial,1,INP1,34.43866
+7/31/18,5,Intermediate,Partial,1,INP1,39.7606
+8/6/18,6,Intermediate,Partial,1,INP1,36.60253
+8/9/18,7,Intermediate,Partial,1,INP1,37.0984
+8/12/18,8,Intermediate,Partial,1,INP1,40.8118
+8/19/18,9,Intermediate,Partial,1,INP1,40.98113
+8/22/18,10,Intermediate,Partial,1,INP1,36.99626
+8/26/18,11,Intermediate,Partial,1,INP1,36.03393
+9/1/18,12,Intermediate,Partial,1,INP1,38.083
+9/3/18,13,Intermediate,Partial,1,INP1,36.18313
+9/11/18,14,Intermediate,Partial,1,INP1,32.78606
+9/16/18,15,Intermediate,Partial,1,INP1,32.5328
+9/21/18,16,Intermediate,Partial,1,INP1,33.67746
+9/25/18,17,Intermediate,Partial,1,INP1,33.45193
+9/29/18,18,Intermediate,Partial,1,INP1,32.25566
+10/4/18,19,Intermediate,Partial,1,INP1,34.5948
+10/7/18,20,Intermediate,Partial,1,INP1,27.01866
+10/18/18,21,Intermediate,Partial,1,INP1,26.90093
+10/21/18,22,Intermediate,Partial,1,INP1,28.17413
+10/23/18,23,Intermediate,Partial,1,INP1,19.65986
+11/3/18,24,Intermediate,Partial,1,INP1,14.49506
+7/15/18,1,Intermediate,Partial,2,INP2,42.98386
+7/19/18,2,Intermediate,Partial,2,INP2,48.5696
+7/22/18,3,Intermediate,Partial,2,INP2,45.30606
+7/29/18,4,Intermediate,Partial,2,INP2,42.62833
+7/31/18,5,Intermediate,Partial,2,INP2,47.35266
+8/6/18,6,Intermediate,Partial,2,INP2,46.46993
+8/9/18,7,Intermediate,Partial,2,INP2,46.45613
+8/12/18,8,Intermediate,Partial,2,INP2,49.2264
+8/19/18,9,Intermediate,Partial,2,INP2,47.99786
+8/22/18,10,Intermediate,Partial,2,INP2,44.9474
+8/26/18,11,Intermediate,Partial,2,INP2,45.44213
+9/1/18,12,Intermediate,Partial,2,INP2,46.77933
+9/3/18,13,Intermediate,Partial,2,INP2,44.65826
+9/11/18,14,Intermediate,Partial,2,INP2,39.92786
+9/16/18,15,Intermediate,Partial,2,INP2,42.38146
+9/21/18,16,Intermediate,Partial,2,INP2,42.17426
+9/25/18,17,Intermediate,Partial,2,INP2,41.39966
+9/29/18,18,Intermediate,Partial,2,INP2,38.541
+10/4/18,19,Intermediate,Partial,2,INP2,41.62166
+10/7/18,20,Intermediate,Partial,2,INP2,34.6288
+10/18/18,21,Intermediate,Partial,2,INP2,32.24066
+10/21/18,22,Intermediate,Partial,2,INP2,34.97773
+10/23/18,23,Intermediate,Partial,2,INP2,26.7102
+11/3/18,24,Intermediate,Partial,2,INP2,18.7014
+7/15/18,1,Intermediate,Partial,3,INP3,38.7058
+7/19/18,2,Intermediate,Partial,3,INP3,43.19386
+7/22/18,3,Intermediate,Partial,3,INP3,42.78153
+7/29/18,4,Intermediate,Partial,3,INP3,40.34293
+7/31/18,5,Intermediate,Partial,3,INP3,45.56166
+8/6/18,6,Intermediate,Partial,3,INP3,43.55413
+8/9/18,7,Intermediate,Partial,3,INP3,44.24033
+8/12/18,8,Intermediate,Partial,3,INP3,47.69506
+8/19/18,9,Intermediate,Partial,3,INP3,46.0108
+8/22/18,10,Intermediate,Partial,3,INP3,44.57706
+8/26/18,11,Intermediate,Partial,3,INP3,44.0436
+9/1/18,12,Intermediate,Partial,3,INP3,46.1176
+9/3/18,13,Intermediate,Partial,3,INP3,44.1978
+9/11/18,14,Intermediate,Partial,3,INP3,39.89246
+9/16/18,15,Intermediate,Partial,3,INP3,42.50613
+9/21/18,16,Intermediate,Partial,3,INP3,43.39886
+9/25/18,17,Intermediate,Partial,3,INP3,41.95766
+9/29/18,18,Intermediate,Partial,3,INP3,40.37893
+10/4/18,19,Intermediate,Partial,3,INP3,43.2632
+10/7/18,20,Intermediate,Partial,3,INP3,35.82446
+10/18/18,21,Intermediate,Partial,3,INP3,34.4346
+10/21/18,22,Intermediate,Partial,3,INP3,37.96833
+10/23/18,23,Intermediate,Partial,3,INP3,29.5824
+11/3/18,24,Intermediate,Partial,3,INP3,24.3944
+7/29/18,4,Mesic ,Total,1,MET1,25.47893
+7/31/18,5,Mesic ,Total,1,MET1,21.38546
+8/6/18,6,Mesic ,Total,1,MET1,20.1796
+8/9/18,7,Mesic ,Total,1,MET1,15.53233
+8/12/18,8,Mesic ,Total,1,MET1,7.8626
+8/19/18,9,Mesic ,Total,1,MET1,19.87253
+8/26/18,11,Mesic ,Total,1,MET1,16.81553
+9/3/18,13,Mesic ,Total,1,MET1,17.04026
+9/11/18,14,Mesic ,Total,1,MET1,6.95493
+9/16/18,15,Mesic ,Total,1,MET1,17.13266
+9/29/18,18,Mesic ,Total,1,MET1,18.84253
+10/4/18,19,Mesic ,Total,1,MET1,20.14506
+10/7/18,20,Mesic ,Total,1,MET1,21.72893
+10/18/18,21,Mesic ,Total,1,MET1,19.49726
+10/21/18,22,Mesic ,Total,1,MET1,23.37666
+7/29/18,4,Mesic ,Total,2,MET2,26.09726
+7/31/18,5,Mesic ,Total,2,MET2,21.85986
+8/6/18,6,Mesic ,Total,2,MET2,20.5944
+8/9/18,7,Mesic ,Total,2,MET2,16.28493
+8/12/18,8,Mesic ,Total,2,MET2,7.7604
+8/19/18,9,Mesic ,Total,2,MET2,20.41433
+8/26/18,11,Mesic ,Total,2,MET2,17.21233
+9/3/18,13,Mesic ,Total,2,MET2,17.36013
+9/11/18,14,Mesic ,Total,2,MET2,6.37413
+9/16/18,15,Mesic ,Total,2,MET2,17.34666
+9/29/18,18,Mesic ,Total,2,MET2,19.7026
+10/4/18,19,Mesic ,Total,2,MET2,20.65753
+10/7/18,20,Mesic ,Total,2,MET2,22.16086
+10/18/18,21,Mesic ,Total,2,MET2,21.07106
+10/21/18,22,Mesic ,Total,2,MET2,23.03185
+7/29/18,4,Mesic ,Total,3,MET3,24.99653
+7/31/18,5,Mesic ,Total,3,MET3,20.61166
+8/6/18,6,Mesic ,Total,3,MET3,19.58173
+8/9/18,7,Mesic ,Total,3,MET3,14.81493
+8/12/18,8,Mesic ,Total,3,MET3,8.30973
+8/19/18,9,Mesic ,Total,3,MET3,19.84006
+8/26/18,11,Mesic ,Total,3,MET3,16.57946
+9/3/18,13,Mesic ,Total,3,MET3,16.81166
+9/11/18,14,Mesic ,Total,3,MET3,7.10686
+9/16/18,15,Mesic ,Total,3,MET3,17.76073
+9/29/18,18,Mesic ,Total,3,MET3,19.34166
+10/4/18,19,Mesic ,Total,3,MET3,19.7178
+10/7/18,20,Mesic ,Total,3,MET3,21.2686
+10/18/18,21,Mesic ,Total,3,MET3,21.13393
+10/21/18,22,Mesic ,Total,3,MET3,21.97893
+7/29/18,4,Mesic ,Partial,3,MEP1,26.33037
+7/31/18,5,Mesic ,Partial,3,MEP1,21.7498
+8/6/18,6,Mesic ,Partial,3,MEP1,20.55433
+8/9/18,7,Mesic ,Partial,3,MEP1,16.58053
+8/12/18,8,Mesic ,Partial,3,MEP1,14.6996
+8/19/18,9,Mesic ,Partial,3,MEP1,21.50326
+8/26/18,11,Mesic ,Partial,3,MEP1,18.57946
+9/3/18,13,Mesic ,Partial,3,MEP1,19.1932
+9/11/18,14,Mesic ,Partial,3,MEP1,10.90273
+9/16/18,15,Mesic ,Partial,3,MEP1,20.20473
+9/29/18,18,Mesic ,Partial,3,MEP1,22.65693
+10/4/18,19,Mesic ,Partial,3,MEP1,24.6044
+10/7/18,20,Mesic ,Partial,3,MEP1,27.00826
+10/18/18,21,Mesic ,Partial,3,MEP1,25.46913
+10/21/18,22,Mesic ,Partial,3,MEP1,24.25742
+7/29/18,4,Mesic ,Partial,2,MEP2,25.90706
+7/31/18,5,Mesic ,Partial,2,MEP2,21.6708
+8/6/18,6,Mesic ,Partial,2,MEP2,20.58626
+8/9/18,7,Mesic ,Partial,2,MEP2,15.42326
+8/12/18,8,Mesic ,Partial,2,MEP2,14.98833
+8/19/18,9,Mesic ,Partial,2,MEP2,20.489
+8/26/18,11,Mesic ,Partial,2,MEP2,17.3128
+9/3/18,13,Mesic ,Partial,2,MEP2,17.71613
+9/11/18,14,Mesic ,Partial,2,MEP2,12.11066
+9/16/18,15,Mesic ,Partial,2,MEP2,17.5456
+9/29/18,18,Mesic ,Partial,2,MEP2,19.27613
+10/4/18,19,Mesic ,Partial,2,MEP2,19.68946
+10/7/18,20,Mesic ,Partial,2,MEP2,21.576
+10/18/18,21,Mesic ,Partial,2,MEP2,20.24186
+10/21/18,22,Mesic ,Partial,2,MEP2,21.08646
+7/29/18,4,Mesic ,Partial,3,MEP3,25.89466
+7/31/18,5,Mesic ,Partial,3,MEP3,23.43686
+8/6/18,6,Mesic ,Partial,3,MEP3,22.5124
+8/9/18,7,Mesic ,Partial,3,MEP3,19.82926
+8/12/18,8,Mesic ,Partial,3,MEP3,17.85093
+8/19/18,9,Mesic ,Partial,3,MEP3,21.20653
+8/26/18,11,Mesic ,Partial,3,MEP3,18.5318
+9/3/18,13,Mesic ,Partial,3,MEP3,18.0652
+9/11/18,14,Mesic ,Partial,3,MEP3,14.63913
+9/16/18,15,Mesic ,Partial,3,MEP3,18.38637
+9/29/18,18,Mesic ,Partial,3,MEP3,20.1848
+10/4/18,19,Mesic ,Partial,3,MEP3,20.14667
+10/7/18,20,Mesic ,Partial,3,MEP3,22.24228
+10/18/18,21,Mesic ,Partial,3,MEP3,21.20386
+10/21/18,22,Mesic ,Partial,3,MEP3,22.30408
+7/29/18,4,Mesic ,Open,1,MEO1,27.68513
+7/31/18,5,Mesic ,Open,1,MEO1,22.6918
+8/6/18,6,Mesic ,Open,1,MEO1,21.2576
+8/9/18,7,Mesic ,Open,1,MEO1,19.17613
+8/12/18,8,Mesic ,Open,1,MEO1,19.8656
+8/19/18,9,Mesic ,Open,1,MEO1,21.73713
+8/26/18,11,Mesic ,Open,1,MEO1,18.81553
+9/3/18,13,Mesic ,Open,1,MEO1,18.70286
+9/11/18,14,Mesic ,Open,1,MEO1,21.40692
+9/16/18,15,Mesic ,Open,1,MEO1,20.93053
+9/29/18,18,Mesic ,Open,1,MEO1,21.2396
+10/4/18,19,Mesic ,Open,1,MEO1,21.93266
+10/7/18,20,Mesic ,Open,1,MEO1,23.94733
+10/18/18,21,Mesic ,Open,1,MEO1,23.53353
+10/21/18,22,Mesic ,Open,1,MEO1,25.20626
+7/29/18,4,Mesic ,Open,2,MEO2,27.52686
+7/31/18,5,Mesic ,Open,2,MEO2,22.9636
+8/6/18,6,Mesic ,Open,2,MEO2,21.25966
+8/9/18,7,Mesic ,Open,2,MEO2,19.88833
+8/12/18,8,Mesic ,Open,2,MEO2,19.65353
+8/19/18,9,Mesic ,Open,2,MEO2,22.523
+8/26/18,11,Mesic ,Open,2,MEO2,19.5922
+9/3/18,13,Mesic ,Open,2,MEO2,19.71373
+9/11/18,14,Mesic ,Open,2,MEO2,20.04983
+9/16/18,15,Mesic ,Open,2,MEO2,22.94773
+9/29/18,18,Mesic ,Open,2,MEO2,24.266
+10/4/18,19,Mesic ,Open,2,MEO2,24.61146
+10/7/18,20,Mesic ,Open,2,MEO2,25.7528
+10/18/18,21,Mesic ,Open,2,MEO2,25.86393
+10/21/18,22,Mesic ,Open,2,MEO2,23.17573
+7/29/18,4,Mesic ,Open,3,MEO3,28.81646
+7/31/18,5,Mesic ,Open,3,MEO3,24.571
+8/6/18,6,Mesic ,Open,3,MEO3,23.3928
+8/9/18,7,Mesic ,Open,3,MEO3,22.82746
+8/12/18,8,Mesic ,Open,3,MEO3,19.45353
+8/19/18,9,Mesic ,Open,3,MEO3,23.95653
+8/26/18,11,Mesic ,Open,3,MEO3,21.58646
+9/3/18,13,Mesic ,Open,3,MEO3,21.29373
+9/11/18,14,Mesic ,Open,3,MEO3,20.50358
+9/16/18,15,Mesic ,Open,3,MEO3,19.70493
+9/29/18,18,Mesic ,Open,3,MEO3,24.45133
+10/4/18,19,Mesic ,Open,3,MEO3,27.107
+10/7/18,20,Mesic ,Open,3,MEO3,25.54366
+10/18/18,21,Mesic ,Open,3,MEO3,24.99406
+10/21/18,22,Mesic ,Open,3,MEO3,22.71013

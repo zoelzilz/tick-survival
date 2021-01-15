@@ -1,0 +1,651 @@
+---
+title: "Cleaning Tick Data"
+author: "Zoe Zilz"
+date: "9/24/2019"
+output: html_document
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+	echo = TRUE,
+	message = FALSE,
+	warning = FALSE
+)
+```
+
+We need to clean up the data so that it works with the "survival" package
+First let's install the necessary packages:
+```{r packages, message=FALSE, warning=FALSE, include=FALSE, results=}
+#install.packages("survival")
+#install.packages("KMsurv")
+#install.packages("survminer")
+#install.packages("tidyverse")
+#install.packages("ggfortify")
+#install.packages("car")
+# this package should include some example data
+#install.packages("lubridate")
+#install.packages("coxme")
+#install.packages("splitstackshape")
+
+
+library(survival)
+library(KMsurv)
+library(survminer)
+library(tidyverse)
+library(ggplot2)
+library(readr)
+library(coxme)
+#library(ggfortify)
+#library(ggthemes)
+#library(extrafont)
+#library(Design)
+#library(rms)
+library(car)
+#library(scales) # For the percent_format() function
+#loadfonts(device = "pdf")
+library(lubridate)
+library(splitstackshape)
+
+```
+
+
+Importing data
+(when re-doing this, can skip ahead to the next part and just import the new csv)
+```{r skip me, eval=FALSE, include=FALSE}
+#2018
+# need to convert from wide format into long which I've been doing by hand but maybe there's a way in R
+#meltme <- read_csv("tick18_tomelt.csv")
+
+# pivot longer is going to make things vertical, so each date of tick checking has its own row
+
+#melted <- meltme %>% 
+#  pivot_longer(names_to = "date_alive", values_to = "num_alive", cols = c("7/28/18" :"10/21/18"))
+
+# add a column of dead ticks by subtracting line from line before
+# lead/ lag
+# lag indicates row after, lead indicates row before
+# mutate adds a column
+#melted2 <- melted %>% 
+#  mutate(num_dead = lag(num_alive, default = first(num_alive))- num_alive)
+
+#remove rows with negative values for num_dead (indicates the day of deployment because it would be the low number before that day minus the 40 ticks deployed)
+
+#melted3 <- melted2 %>% 
+#  filter(num_dead >= 0)
+
+# alternatively, just delete rows for which num_alive = 40
+# but I also want to remove rows where nobody died UNLESS its the last sampling day and then I want to keep it?
+# want to keep everything for which the number dead is greater than zero OR the date is 10/21/18 and the number dead is zero
+#melted3 <- melted2 %>%
+#  filter(num_alive != 40) %>% 
+#  filter(num_dead >0)
+
+
+#melted4 <- melted3%>% 
+#  filter(if (date_alive=="10/21/18") num_dead == 0 else num_dead>0) %>%  
+#  tail(1)
+  
+#now trying to add number of rows per date based on the number in num_dead
+#remove = FALSE preserves the # dead, so I can check that it did it right
+
+#expanded <- uncount(melted3, num_dead, .remove = FALSE)
+
+# export to a CSV so I can add the survivors back in 
+
+#write_csv(expanded, "tick18_complete.csv")
+#### DONT UNHASHTAG THIS OR IT WILL OVERWRITE
+```
+
+-in excel, I manually added in rows for the survivors depending on how many were alive at the end of the thing (10/21/18)
+-also added a column of death_tf
+-this all probably could have been done in R but i didnt want to write the code to conditionally expand (uncount) only if date = 10/21/18 (plus other factors had to be true)... maybe figure this out later
+-at this point easier to just do manually
+-also added a column with date_start (7/28/18) even though this could have easily been coded
+
+## Start Here!
+## 2018
+### Cleaning 2018 Data
+```{r clean data 2018}
+# importing the new set
+tick18_complete <- read_csv("tick18_complete.csv")
+
+#clean it up and remove useless shit
+tick18_clean <- tick18_complete %>% 
+  select(SITE, BLOCK, PLOT, SPECIES, date_start, date_alive, death_t_f) %>% 
+  rename(climate = SITE, exclosure = PLOT, species = SPECIES, block = BLOCK)
+
+
+# need lubridate to calculate interval between start and death date
+
+tick18_clean$date_start <- as.Date(tick18_clean$date_start)
+tick18_clean$date_alive <- as.Date(tick18_clean$date_alive)
+
+tick18_final <- tick18_clean %>% 
+  mutate(days_elpsd = as.double(difftime(ymd(date_alive), ymd(date_start), units = "days"))) %>%
+  mutate(excl_ranked = case_when(
+    exclosure == "W" ~ 2, # partial
+    exclosure == "WC" ~ 1, # open
+    exclosure == "O" ~ 3 # total
+  ))
+  
+### NOTE: for some reason that I can't understand, both exclosure and excl_ranked are invisible unless their dataframe is before them e.g. tick18_final$exclosure
+
+tick18_final$exclosure <- as.factor(tick18_final$exclosure) # also not sure why this is necessary, but it is
+
+head(tick18_final)
+```
+
+Data Wrangling (2018)
+
+*The following is redundant and has been solved above, but retaining it for lesson learning purposes*
+```{r skip me too, eval=FALSE, include=FALSE}
+# the 2018 data is currently majorly fucked up. it is in "long" format, with multiple obvs per individual, and needs to be in wide, with the time to event and event true or false
+
+# death as an event is also not currently coded. 1 means alive and 0 means no longer alive
+
+# I am going to see if i can fix all of this within R
+
+
+
+#remove redundant column
+#tick18 <- tick18 %>% 
+  #select(-X10, -Experiment)
+
+#head(tick18)
+
+#wide_tick18 <- tick18 %>% spread(date, death_t_f)
+#View(wide_tick18)
+#head(wide_tick18, 24)
+
+# this is cool but I don't think it actually got me where I want to be, since now I just have whether or not an event happened in a week instead of time to event
+
+# because this is an interval do we need tstart and tend
+
+
+
+```
+
+### Data Analysis 2018
+We have survival data and want to understand the roles of 
+- tick species: Dermacentor vs. Ixodes
+- herbivore density: Partial exclosure (wild only), Total exclosure (no ungulates), Open (livestock and wild)
+- Climate: Arid, Mesic, Intermediate
+
+## added for MS (9 Dec 2020)
+microclimate data (humidity and temperature) as predictors in a second set of models instead of categorical herbivore treatment and aridity.
+
+...in larval tick survival
+
+We are going to run a Cox Proportional Hazards model because that is appropriate for assessing the impacts of multiple variables on survival time. The Cox Proportional Hazards model is a type of non-parametric? semi-parametric (linear predictors) regression. We need to run a MIXED EFFECTS Cox PH because of the need for a random block effect.
+```{r analysis 2018}
+#create the survival object
+tick18_surv<- (Surv(tick18_final$days_elpsd, tick18_final$death_t_f, type ="right"))
+
+# create COX PH model with plot (exclosure) and site (climate) and the interaction, plus block as a random effect
+#tick18surv_model<-coxph(tick18_surv~ species * climate * exclosure * (1|block), data = tick18_final)
+## the above base model does not work because cox PH doesn't allow for mixed (random) effects
+### however, coxme (cox mixed effects) does! (code from: https://stats.idre.ucla.edu/r/dae/mixed-effects-cox-regression/)
+tick18surv_model<-coxme(tick18_surv~ species * climate * exclosure + (1|block), data = tick18_final)
+tick18surv_model
+Anova(tick18surv_model)
+
+# model with ranked exclosure values instead of categorical
+tick18surv_model1<-coxme(tick18_surv~ species * climate * excl_ranked + (1|block), data = tick18_final)
+tick18surv_model1
+Anova(tick18surv_model1)
+
+# model without interaction term
+tick18surv_model2<-coxme(tick18_surv~ species + climate + exclosure + (1|block), data = tick18_final)
+tick18surv_model2
+Anova(tick18surv_model2)
+
+# without random block effect
+tick18surv_model3<-coxph(tick18_surv~ species + climate + exclosure, data = tick18_final)
+summary(tick18surv_model3)
+Anova(tick18surv_model3)
+
+#testing assumption of proportional hazards
+## not sure how this works in coxme package, will update
+#cox.zph(tick18surv_model) 
+
+
+#AIC comparison
+AIC(tick18surv_model, tick18surv_model1, tick18surv_model2, tick18surv_model3)
+# first model has lowest AIC
+```
+### Plotting...something
+```{r plotting 2018}
+
+## create predicted object and plot
+## use predict, with correct object type (coxme model), will run predict.coxme()
+tick18surv_fit_lp<- predict(tick18surv_model, type = "lp") # type can also = "risk", which looks like it's exponentiated lps (linear predictors)
+tick18surv_fit_risk<- predict(tick18surv_model, type = "risk")
+
+
+# checking that assumption
+#lp plots
+plot(exp(tick18surv_fit_lp), col = 3 + (tick18_final$species == "DEVA"))
+plot((tick18surv_fit_lp), col = 3 + (tick18_final$species == "DEVA"))
+
+# risk plots
+plot(exp(tick18surv_fit_risk), col = 3 + (tick18_final$species == "DEVA"))
+plot((tick18surv_fit_risk), col = 3 + (tick18_final$species == "DEVA"))
+
+       
+# yep
+
+# splitting by colors seems to only work when there are two levels to the variable, unsure why
+# categorizing by just col = species, or whatever, isn't working
+### Error in plot.xy(xy, type, ...) : invalid color name 'DEVA'
+
+# what happens if we try to force time to be the x axis
+## using qplot so I can actually split things up and color them:
+
+# by exclosure
+qplot(x = tick18_final$days_elpsd,
+      y = tick18surv_fit_risk,
+      color = tick18_final$exclosure)
+
+# by species
+qplot(x = tick18_final$days_elpsd,
+      y = tick18surv_fit_risk,
+      color = tick18_final$species)
+
+```
+
+### Running the model for the species separately
+Dermacenter
+
+```{r deva}
+tick18_deva <- tick18_final %>% 
+  filter(species == "DEVA")
+#create the survival object
+deva18_surv<- (Surv(tick18_deva$days_elpsd, tick18_deva$death_t_f, type ="right"))
+
+# create COX PH model with plot (exclosure) and site (climate) and the interaction, plus block as a random effect
+deva18surv_model<-coxme(deva18_surv~ climate * exclosure + (1|block), data = tick18_deva)
+deva18surv_model
+Anova(deva18surv_model)
+
+# model with ranked exclosure values instead of categorical
+deva18surv_model1 <-coxme(deva18_surv~ climate * excl_ranked + (1|block), data = tick18_deva)
+deva18surv_model1
+Anova(deva18surv_model1)
+
+# model without interaction term
+deva18surv_model2<-coxme(deva18_surv~ climate + exclosure + (1|block), data = tick18_deva)
+deva18surv_model2
+Anova(deva18surv_model2)
+
+# without random block effect
+deva18surv_model3<-coxph(deva18_surv~ climate + exclosure, data = tick18_deva)
+summary(deva18surv_model3)
+Anova(deva18surv_model3)
+
+#testing assumption of proportional hazards
+## not sure how this works in coxme package, will update
+#cox.zph(deva18surv_model) 
+
+
+#AIC comparison
+AIC(deva18surv_model, deva18surv_model1, deva18surv_model2, deva18surv_model3)
+# first model still has lowest AIC
+
+# we can directly interpret the magnitude of the random effect by exponentiating the coefficients
+deva18_randoms<- ranef(deva18surv_model)
+exp(deva18_randoms[[1]]) # can also use deva18_randoms$block to get coefficients
+
+# perdicting/plotting risk function
+deva18surv_fit<- predict(deva18surv_model, type = "risk")
+plot(deva18surv_fit)
+
+# by time and exclosure
+qplot(x = tick18_deva$days_elpsd,
+      y = deva18surv_fit,
+      color = tick18_deva$exclosure)
+
+# with ranked exlcosure (continuous variable) on x axis (even tho this model didn't perform well)
+qplot(x = tick18_deva$excl_ranked,
+      y = deva18surv_fit
+      )
+```
+Ixodes
+```{r ixpa}
+tick18_ixpa <- tick18_final %>% 
+  filter(species == "IXPA")
+#create the survival object
+ixpa18_surv<- (Surv(tick18_ixpa$days_elpsd, tick18_ixpa$death_t_f, type ="right"))
+
+# create COX PH model with plot (exclosure) and site (climate) and the interaction, plus block as a random effect
+ixpa18surv_model<-coxme(ixpa18_surv~ climate * exclosure + (1|block), data = tick18_ixpa)
+ixpa18surv_model
+Anova(ixpa18surv_model)
+
+# model with ranked exclosure values instead of categorical
+ixpa18surv_model1 <-coxme(ixpa18_surv~ climate * excl_ranked + (1|block), data = tick18_ixpa)
+ixpa18surv_model1
+Anova(ixpa18surv_model1)
+
+# model without interaction term
+ixpa18surv_model2<-coxme(ixpa18_surv~ climate + exclosure + (1|block), data = tick18_ixpa)
+ixpa18surv_model2
+Anova(ixpa18surv_model2)
+
+# without random block effect
+ixpa18surv_model3<-coxph(ixpa18_surv~ climate + exclosure, data = tick18_ixpa)
+summary(ixpa18surv_model3)
+Anova(ixpa18surv_model3)
+
+#testing assumption of proportional hazards
+## not sure how this works in coxme package, will update
+#cox.zph(ixpa18surv_model) 
+
+
+#AIC comparison
+AIC(ixpa18surv_model, ixpa18surv_model1, ixpa18surv_model2, ixpa18surv_model3)
+# first model still has lowest AIC
+
+# we can directly interpret the magnitude of the random effect by exponentiating the coefficients
+ixpa18_randoms<- ranef(ixpa18surv_model)
+exp(ixpa18_randoms[[1]])
+
+
+# perdicting/plotting risk function
+ixpa18surv_fit<- predict(ixpa18surv_model, type = "risk")
+plot(ixpa18surv_fit)
+
+# by time and exclosure
+qplot(x = tick18_ixpa$days_elpsd,
+      y = ixpa18surv_fit,
+      color = tick18_ixpa$exclosure)
+
+# with ranked exlcosure (continuous variable) on x axis (even tho this model didn't perform well)
+qplot(x = tick18_ixpa$excl_ranked,
+      y = ixpa18surv_fit
+      )
+```
+
+##Adding Analyses for Microclimate ~ Survival
+
+Note from Dev: so a couple things: for temperature, there are fewer mesic dates than interim and arid, so might want to just use the dates that correspond to the tick cage checks. And humidity needs to be tidied still. 
+
+### Cleaning and Exploring Climate Data
+*to do:*
+- melt this so there is an entry per plot per date
+- attach to temperature data
+- average
+- ANOVA between plots
+- plot raw data to check out dist
+- plot raw data vs date
+
+Cleaning Humidity
+```{r}
+# pull in humidity CSV
+humidity<-read_csv("humidity2018.csv")
+#head(humidity)
+
+
+# pivot longer is going to make things vertical, so each date of checking + plot has its own row
+
+humid_clean <- humidity %>% 
+  pivot_longer(names_to = "plotID", values_to = "humidity", cols = c("AR_1_Open_1" :"ME_3_T_3")) %>% 
+  #arrange(plotID) %>%   # sorts by plot ID, only necessary when i was figuring stuff out
+  concat.split( 3, sep = "_", drop = TRUE) %>%   #need to split concatenated plotID into its parts (which are climate_block#_treatment_cage#) ... I guess 'separate()' is the tidyverse version?
+  rename(Climate_Level = plotID_1, Block = plotID_2, Treatment = plotID_3, cage = plotID_4) %>% 
+  dplyr::group_by(Climate_Level, Block, Treatment, Date) %>% 
+  summarize(mean_humid = mean(humidity)) %>%    #average the humidity at the plot level to match temp
+  mutate(Treatment = case_when(Treatment == "Open"~ "O",
+                               Treatment == "T" ~ "T",
+                               Treatment == "P" ~"P"))%>%  # replaces treatment names with letters to match temp, this way is fucking stupid but "replace" throws an error I can't figure out
+#in baseR is easy: humid_clean$Treatment[humid_clean$Treatment == "Open"] <- "O"
+# could have also used forcats::fct_recode because Treatment became a factor somehow
+  
+  unite("plotID", c(Climate_Level,Treatment, Block), sep= "") #now we need to re-concatenate the plotID so it matches temperature
+
+head(humid_clean)
+str(humid_clean)
+
+
+
+#write_csv(humid_long, "humidity_clean.csv")
+
+```
+Humidity data frame should somewhat match temperature data frame now, but there are more temperature dates than humidity ones. So we will need to combine the two with this in mind!
+```{r}
+# import temperature data
+temp <- read_csv("temp2018.csv") %>% 
+  select(Date, Plot_ID, Temp) %>% 
+  rename(plotID = Plot_ID)
+
+# now smash them together using base R i guess...
+
+microclimate <- merge(temp, humid_clean) %>% 
+  arrange(plotID, Date) 
+
+microclimate$Date <- mdy(microclimate$Date) # necessary to get dates recognized
+
+head(microclimate)
+```
+Visualize and play around with the climate data before we bind to the tick data:
+
+```{r}
+
+attach(microclimate)
+# look at distributions
+# humidity
+hist(microclimate$mean_humid)
+# looks somewhat normal except for all the 65 degree days
+
+# humidity
+hist(microclimate$Temp)
+# definitely not normal
+
+# are either related to time though?
+qplot(Date,Temp, colour = plotID)
+qplot(Date, mean_humid, colour = plotID)
+```
+
+
+
+
+
+
+
+
+
+## 2019
+### Data Wrangling (2019)
+
+```{r clean data 2019}
+#2019
+tick19<- read_csv("tick2019.csv")
+# dataset is tick19
+
+#View(tick19)
+
+# data is already tidy
+
+# want to rename "plot" to "exclosure" and "site" to "climate" though, for confusion's sake
+tick19clean <- tick19 %>% 
+  select(site, block, plot, Location_ID, days_elpsd, death_tf) %>% 
+  rename(climate = site, exclosure = plot, microclimate = Location_ID) %>% 
+  mutate(excl_ranked = case_when(
+    exclosure == "Total" ~ 3,
+    exclosure == "Partial" ~ 2,
+    exclosure == "Control" ~ 1
+  ))
+
+head(tick19clean)
+```
+
+# Data Analysis 2019
+We have survival data and want to understand the roles that herbivore density (partial exclosure, total exclosure, open) and climate (arid, mesic, intermediate) plan in the survival of larval ticks in cages at Tejon Ranch.
+
+We are going to run a Cox Proportional Hazards model because that is appropriate for assessing the impacts of multiple variables on survival time. The Cox Proportional Hazards model is a type of non-parametric? semi-parametric (linear predictors) regression.
+
+```{r analysis 2019}
+#create the survival object
+tick19_surv<- (Surv(tick19clean$days_elpsd, tick19clean$death_tf, type ="right"))
+
+# create COX PH model with plot (exclosure) and site (climate) and the interaction, plus block as a random effect
+tick19surv_model<-coxme(tick19_surv~ climate * exclosure + (1|block), data = tick19clean)
+tick19surv_model
+Anova(tick19surv_model)
+
+# model with exclosure as ranked continuous variable
+tick19surv_model1<-coxme(tick19_surv~ climate * exclosure + (1|block), data = tick19clean)
+tick19surv_model1
+Anova(tick19surv_model1)
+
+# model without interaction term
+tick19surv_model2<-coxme(tick19_surv~ climate + exclosure + (1|block), data = tick19clean)
+tick19surv_model2
+Anova(tick19surv_model2)
+
+# without random block effect 
+tick19surv_model3<-coxph(tick19_surv~ climate + exclosure, data = tick19clean)
+summary(tick19surv_model3)
+Anova(tick19surv_model3)
+
+#testing assumption of proportional hazards
+#cox.zph(tick19surv_model3) 
+
+#AIC comparison
+AIC(tick19surv_model, tick19surv_model2, tick19surv_model3)
+```
+###The following is from "Cox Proportional Hazards Regression for Survival Data in R" by Fox and Weisberg
+
+- The column marked z in the output records the ratio of each regression coefficient to its standard error, a Wald statistic which is asymptotically standard normal under the hypothesis that the corresponding β is zero. The coefficients for the covariates age and prio (prior convictions) have very small p-values, while the coefficient for fin (financial aid—the focus of the study) has a p-value only slightly less than 0.05.
+-􏰀 The exponentiated coefficients in the second column of the first panel (and in the first column of the second panel) of the output are interpretable as multiplicative effects on the hazard. Thus, for example, holding the other covariates constant, an additional year of age reduces the weekly hazard of rearrest by a factor of eb2 = 0.944 on average—that is, by 5.6 percent. Similarly, each prior conviction increases the hazard by a factor of 1.096, or 9.6 percent.
+-􏰀 The likelihood-ratio, Wald, and score chi-square statistics at the bottom of the output are asymptotically equivalent tests of the omnibus null hypothesis that all of the βs are zero. In this instance, the test statistics are in close agreement, and the omnibus null hypothesis is soundly rejected.
+
+### Plotting survival curve based on mean values of variables
+```{r plotting 2019}
+
+## create survfit object and plot
+tick19surv_fit<- predict(tick19surv_model)
+plot(tick19surv_fit, col=c("red", "blue", "green")[tick19clean$exclosure])
+```
+
+### Instead, we want to plot a curve that indicates how survival changes with our variables of interest
+- using "Cox Proportional Hazards Models in R" (in Evernote) p. 7
+ - we will first look at climate, holding all other variables to their mean (but we only have categorical variables...)
+ - the documentation I'm following says that for "dummy" variables ( I think it means categorical?), the "average value" is the proportion coded "Control" in the data set AND I HAVE NO IDEA WHAT THAT MEANS but I'm gonna try it
+ - currently not working so everything is hashtagged out
+
+ 
+```{r}
+
+# forest plots are a fun way to visualize model summary
+ggforest(tick19surv_model3)
+
+
+#tick19_climate <- with(tick19clean, data.frame(climate = as.factor(c("Arid", "Intermediate")), exclosure = as.factor(rep(mean(exclosure == "Total"),2)), block = rep(mean(block)), microclimate = rep("open"),2))
+# ^ this didn't work, see below
+
+# coding a "categorical" variable didn't work at all, so i held it constant at "Total" exclosure for this figure
+# I will then need to make another figure later for "Partial" exclosure
+   
+```
+Creating the Total Exclosure x Climate Figure
+- plotting difference between intermediate and arid climates at total exclosure plots
+```{r}
+tick19_climate_totalex <- with(tick19clean, data.frame(climate = c("Arid", "Intermediate"), exclosure = rep("Total"),2, block = rep(mean(block)), microclimate = rep("open"),2))
+
+tick19_climate_totalex2 <- tick19_climate_totalex %>% 
+  select(climate, exclosure)
+
+#now we predict
+
+tickfit_totalex <- survfit(tick19surv_model3, newdata = tick19_climate_totalex2)
+##getting an error that something isn't matching up
+
+plot(tickfit_totalex,
+     conf.int = TRUE,
+     lty = c(1,2),
+     ylab = "Proportion Tick Survival",
+     xlab = "Days",
+     main = "Total Exclosure")
+     legend("topright", 
+            legend = c("climate = Arid", "climate = Intermediate"), 
+            lty = c(1,2))
+
+#ggadjustedcurves(tick19surv_model3,
+#                 variable = climate,
+#                 method = "conditional",
+#                 data = tick19clean)
+
+  #ggsurvplot(tickfit_totalex, data = tick19_climate_totalex2)
+  # SUPER DUPER CUSTOMIZED PLOT
+  # really want to make this work but currently having a hard time parsing the predicted curves and the ggsurv/ggadjusted curves model
+#ggsurvplot(
+#   tickfit_totalex,                            # survfit object with calculated statistics.
+#   data = tick19_climate_totalex2,             # data used to fit survival curves.
+#   risk.table = TRUE,       # show risk table.
+#   pval = TRUE,             # show p-value of log-rank test.
+#   conf.int = TRUE,         # show confidence intervals for 
+#                            # point estimates of survival curves.
+#   xlim = c(0,60),          # present narrower X axis, but not affect
+#                            # survival estimates.
+#   xlab = "Time in days",   # customize X axis label.
+#   break.time.by = 10,      # break X axis in time intervals by 500.
+#   ggtheme = theme_light(), # customize plot and risk table with a theme.
+# risk.table.y.text.col = T, # colour risk table text annotations.
+#  risk.table.y.text = FALSE # show bars instead of names in text annotations in legend of risk table
+#  #legend.labs = c()                           
+#)
+
+```
+
+Creating the Partial Exclosure x Climate figure
+```{r}
+tick19_climate_partialex <- with(tick19clean, data.frame(climate = c("Arid", "Intermediate"), exclosure = rep("Partial"),2, block = rep(mean(block)), microclimate = rep("open"),2))
+
+tick19_climate_partialex2 <- tick19_climate_partialex %>% 
+  select(climate, exclosure)
+
+#now we predict
+
+tickfit_partialex <- survfit(tick19surv_model3, newdata = tick19_climate_partialex2)
+##getting an error that something isn't matching up
+
+plot(tickfit_partialex,
+     conf.int = TRUE,
+     lty = c(1,2),
+     ylab = "Proportion Tick Survival",
+     xlab = "Days",
+     main = "Partial Exclosure")
+     legend("topright", 
+            legend = c("climate = Arid", "climate = Intermediate"), 
+            lty = c(1,2))
+
+
+```
+
+
+Creating the Control Exclosure x Climate figure
+```{r}
+tick19_climate_controlex <- with(tick19clean, data.frame(climate = c("Arid", "Intermediate"), exclosure = rep("Control"),2, block = rep(mean(block)), microclimate = rep("open"),2))
+
+tick19_climate_controlex2 <- tick19_climate_controlex %>% 
+  select(climate, exclosure)
+
+#now we predict
+
+tickfit_controlex <- survfit(tick19surv_model3, newdata = tick19_climate_controlex2)
+##getting an error that something isn't matching up
+
+plot(tickfit_controlex,
+     conf.int = TRUE,
+     lty = c(1,2),
+     ylab = "Proportion Tick Survival",
+     xlab = "Days",
+     main = "Control (Open) Exclosure")
+     legend("topright", 
+            legend = c("climate = Arid", "climate = Intermediate"), 
+            lty = c(1,2))
+
+```
+
+
