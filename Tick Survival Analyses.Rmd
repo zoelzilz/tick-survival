@@ -122,12 +122,19 @@ tick18_clean$date_start <- as.Date(tick18_clean$date_start)
 tick18_clean$date_alive <- as.Date(tick18_clean$date_alive)
 
 tick18_final <- tick18_clean %>% 
-  mutate(days_elpsd = as.double(difftime(ymd(date_alive), ymd(date_start), units = "days"))) %>%
-  mutate(excl_ranked = case_when(
-    exclosure == "W" ~ 2, # partial
-    exclosure == "WC" ~ 1, # open
-    exclosure == "O" ~ 3 # total
-  ))
+  mutate(days_elpsd = as.double(difftime(ymd(date_alive), ymd(date_start), units = "days"))) %>%  
+    mutate(excl_ranked = case_when(
+    exclosure == "W" ~ 2, # partial (wild only)
+    exclosure == "WC" ~ 1, # open (wild and cattle excluded)
+    exclosure == "O" ~ 3 # total (open)
+  )) %>% 
+  mutate(exclosure = case_when(
+    exclosure == "W" ~ "P", # partial (wild only)
+    exclosure == "WC" ~ "T", # total (wild and cattle excluded)
+    exclosure == "O" ~ "O" # open (open)
+  )) 
+
+
   
 ### NOTE: for some reason that I can't understand, both exclosure and excl_ranked are invisible unless their dataframe is before them e.g. tick18_final$exclosure
 
@@ -368,7 +375,7 @@ qplot(x = tick18_ixpa$excl_ranked,
 
 ##Adding Analyses for Microclimate ~ Survival
 
-Note from Dev: so a couple things: for temperature, there are fewer mesic dates than interim and arid, so might want to just use the dates that correspond to the tick cage checks. And humidity needs to be tidied still. 
+Note from Dev: so a couple things: for temperature, there are fewer mesic dates than interim and arid, so might want to just use the dates that correspond to the tick cage checks. And humidity needs to be tidied still. <- all done
 
 ### Cleaning and Exploring Climate Data
 *to do:*
@@ -378,9 +385,9 @@ Note from Dev: so a couple things: for temperature, there are fewer mesic dates 
 - ANOVA between plots
 - plot raw data to check out dist
 - plot raw data vs date
-
+<- all done
 Cleaning Humidity
-```{r}
+```{r cleaning humidity data}
 # pull in humidity CSV
 humidity<-read_csv("humidity2018.csv")
 #head(humidity)
@@ -391,15 +398,17 @@ humidity<-read_csv("humidity2018.csv")
 humid_clean <- humidity %>% 
   pivot_longer(names_to = "plotID", values_to = "humidity", cols = c("AR_1_Open_1" :"ME_3_T_3")) %>% 
   #arrange(plotID) %>%   # sorts by plot ID, only necessary when i was figuring stuff out
-  concat.split( 3, sep = "_", drop = TRUE) %>%   #need to split concatenated plotID into its parts (which are climate_block#_treatment_cage#) ... I guess 'separate()' is the tidyverse version?
+  concat.split( 3, sep = "_", drop = TRUE) %>%    #need to split concatenated plotID into its parts (which are climate_block#_treatment_cage#) ... I guess 'separate()' is the tidyverse version?
   rename(Climate_Level = plotID_1, Block = plotID_2, Treatment = plotID_3, cage = plotID_4) %>% 
-  dplyr::group_by(Climate_Level, Block, Treatment, Date) %>% 
-  summarize(mean_humid = mean(humidity)) %>%    #average the humidity at the plot level to match temp
   mutate(Treatment = case_when(Treatment == "Open"~ "O",
-                               Treatment == "T" ~ "T",
-                               Treatment == "P" ~"P"))%>%  # replaces treatment names with letters to match temp, this way is fucking stupid but "replace" throws an error I can't figure out
+                               Treatment == "T"~ "T",
+                               Treatment == "P"~ "P")) %>% 
+#replaces treatment names with letters to match temp, this way is fucking stupid but "replace" throws an error I can't figure out
 #in baseR is easy: humid_clean$Treatment[humid_clean$Treatment == "Open"] <- "O"
 # could have also used forcats::fct_recode because Treatment became a factor somehow
+  
+  dplyr::group_by(Climate_Level, Block, Treatment, Date) %>% 
+  summarize(mean_humid = mean(humidity)) %>%    #average the humidity at the plot level to match temp
   
   unite("plotID", c(Climate_Level,Treatment, Block), sep= "") #now we need to re-concatenate the plotID so it matches temperature
 
@@ -412,24 +421,30 @@ str(humid_clean)
 
 ```
 Humidity data frame should somewhat match temperature data frame now, but there are more temperature dates than humidity ones. So we will need to combine the two with this in mind!
-```{r}
+```{r cleaning temp data and merging}
+
+humid_clean$Date <- mdy(humid_clean$Date) # necessary to get dates recognized
+
 # import temperature data
-temp <- read_csv("temp2018.csv") %>% 
+temp <- read_csv("2018_temp_usethis.csv") %>% # updated file jan 22 2021 to include missing temp data
   select(Date, Plot_ID, Temp) %>% 
-  rename(plotID = Plot_ID)
+  rename(plotID = Plot_ID) %>% 
+  dplyr::group_by(plotID, Date) %>% 
+  summarize(mean_temp = mean(Temp))  # there are three temps per date (because they were measured by cage) so we need to average the temps
+
+temp$Date <- mdy(temp$Date) # necessary to get dates recognized
+
 
 # now smash them together using base R i guess...
 
 microclimate <- merge(temp, humid_clean) %>% 
   arrange(plotID, Date) 
 
-microclimate$Date <- mdy(microclimate$Date) # necessary to get dates recognized
-
-head(microclimate)
+View(microclimate)
 ```
 Visualize and play around with the climate data before we bind to the tick data:
 
-```{r}
+```{r visualize climate data}
 
 attach(microclimate)
 # look at distributions
@@ -446,7 +461,32 @@ qplot(Date,Temp, colour = plotID)
 qplot(Date, mean_humid, colour = plotID)
 ```
 
+Binding tick data
 
+* how to decide which climate data (198 obs) goes with which tick data (6479 obs). We have dates that we can match, but only the date deployed and the last date alive for each tick. We could match the climate to the tick using date(collected and date_alive) + plotID. might need to do this manually in excel
+
+```{r binding tick data}
+attach(tick18_final) # WHY IS THIS NECESSARY R I HATE YOU
+
+str(tick18_final) #6479 obs
+str(microclimate) #198 obs
+
+# how are we going to decide which climate data goes with which tick data?
+
+# adjusting original tick dataframe so it matches climate
+tick18_climate <- tick18_final %>% 
+  mutate(climate = case_when(climate == "ARID"~ "AR",
+                               climate == "INTERM" ~ "IN",
+                               climate == "MESIC" ~"ME")) %>% # need to match climate data
+ unite("plotID", c(climate, exclosure, block), sep = "", remove = FALSE) # adds new concat col; REMOVE = FALSE IS NECESSARY TO PRESERVE EXISTING COLUMNS THIS TOOK ME HOURS TO FIGURE OUT
+
+# gonna fuck around manually in excel
+#write_csv(tick18_climate, "tick18_w_climate.csv")
+#write_csv(microclimate, "microclimate_data2.csv")
+
+
+
+```
 
 
 
