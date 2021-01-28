@@ -552,6 +552,7 @@ deva_mc <- tickmc %>%
 devamc_surv <- Surv(deva_mc$tstart, deva_mc$tstop, deva_mc$death_t_f) # dont specify type, it will do automatically
 
 devamc_model <- coxph(devamc_surv ~ mean_temp*mean_humid*exclosure*climate + (1|block), data = deva_mc)
+summary(devamc_model)
 
 #######################
 ixpa_mc <- tickmc %>% 
@@ -560,6 +561,7 @@ ixpa_mc <- tickmc %>%
 ixpamc_surv <- Surv(ixpa_mc$tstart, ixpa_mc$tstop, ixpa_mc$death_t_f) # dont specify type, it will do automatically
 
 ixpamc_model <- coxph(ixpamc_surv ~ mean_temp*mean_humid*exclosure*climate + (1|block), data = ixpa_mc)
+summary(ixpamc_model)
 ```
 
 
