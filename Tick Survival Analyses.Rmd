@@ -438,7 +438,20 @@ temp$Date <- mdy(temp$Date) # necessary to get dates recognized
 # now smash them together using base R i guess...
 
 microclimate <- merge(temp, humid_clean) %>% 
-  arrange(plotID, Date) 
+  arrange(plotID, Date) %>% 
+  mutate(check_num = case_when(Date == "2018-08-06" ~ 1,  
+                               Date == "2018-08-12" ~ 2, 
+                               Date == "2018-08-19"~ 3, #date needs to be in quotes which is stupid
+                               Date == "2018-08-26" ~ 4,
+                               Date =="2018-09-03" ~ 5, # OH MY GOD I JUST LEARNED YOU CAN HIGHLIGHT SOMETHING AND THEN TYPE A QUOTE AND ITLL QUOTE IT R I LOVE YOU
+                               Date =="2018-09-16" ~ 6,
+                               Date =="2018-09-29" ~ 7,
+                               Date =="2018-10-07" ~ 8,
+                               Date =="2018-10-21" ~ 9)) %>% # add column of check_num for # temp/humidity check it is
+  drop_na() %>% 
+  unite("plotID_checknum", c(plotID, check_num), sep = "_", remove = FALSE)# add column of plotID + check_num for a unique check ID for each temp/humidity measurement
+
+unique(microclimate$Date)
 
 View(microclimate)
 ```
@@ -473,21 +486,72 @@ str(microclimate) #198 obs
 
 # how are we going to decide which climate data goes with which tick data?
 
-# adjusting original tick dataframe so it matches climate
+# adjusting original tick dataframe so it matches climate 
 tick18_climate <- tick18_final %>% 
+  mutate(tickID = 1:nrow(tick18_climate)) %>%   # add an ID for each tick
   mutate(climate = case_when(climate == "ARID"~ "AR",
                                climate == "INTERM" ~ "IN",
                                climate == "MESIC" ~"ME")) %>% # need to match climate data
- unite("plotID", c(climate, exclosure, block), sep = "", remove = FALSE) # adds new concat col; REMOVE = FALSE IS NECESSARY TO PRESERVE EXISTING COLUMNS THIS TOOK ME HOURS TO FIGURE OUT
+ unite("plotID", c(climate, exclosure, block), sep = "", remove = FALSE) %>%   # adds new concat col; REMOVE = FALSE IS NECESSARY TO PRESERVE EXISTING COLUMNS THIS TOOK ME HOURS TO FIGURE OUT
+  mutate(times_checked = case_when(date_alive == "2018-08-05" ~ 1, # this is gonna be messy as fuck but i'm going to make a column called "times_checked" 
+                               date_alive == "2018-08-12" ~ 2, #that represents how many times that tick was checked before it died
+                               date_alive == "2018-08-19"~ 3, #date needs to be in quotes which is stupid
+                               date_alive == "2018-08-26" ~ 4,
+                               date_alive =="2018-09-02" ~ 5, # OH MY GOD I JUST LEARNED YOU CAN HIGHLIGHT SOMETHING AND THEN TYPE A QUOTE AND ITLL QUOTE IT R I LOVE YOU
+                               date_alive =="2018-09-16" ~ 6,
+                               date_alive =="2018-09-30" ~ 7,
+                               date_alive =="2018-10-07" ~ 8,
+                               date_alive =="2018-10-21" ~ 9)) %>% #ok, now we need to multiply each tick obs row by the amount of times it was observed
+  uncount(times_checked, .remove = FALSE) %>%   # hmmm.. we just end up with a bunch of rows of duplicate data without the correct dates or temps or anything 
+  group_by_at(vars(2:12)) %>%  # allows me to group by variable numbers instead of names i guess?
+  mutate(check_num = row_number()) %>%  # adds 1,2,3,4,5, etc by how many times it was "uncounted" so we have a check_num for each time tick was checked - matches temp data
+  unite("plotID_checknum", c(plotID, check_num), sep = "_", remove = FALSE) #need to now add a column of plotID + check_num so we can match to climate data
 
-# gonna fuck around manually in excel
+
+# originally tried to fuck around manually in excel:
 #write_csv(tick18_climate, "tick18_w_climate.csv")
 #write_csv(microclimate, "microclimate_data2.csv")
 
-
+# now going to try binding in R with merge, repeating values (i guess sort = FALSE fixes the deletion [should the result be sorted on the "by" columns])
+tickmc <- merge(tick18_climate, microclimate, sort = FALSE)
 
 ```
 
+
+### Analyze Survival ~ Microclimate data
+Bound data manually in Excel. Now need to learn to analyze the survival object/run the model with continuous predictor variable that changes over time (temp and humidity).
+
+https://cran.r-project.org/web/packages/survival/vignettes/timedep.pdf
+
+- we need to build a new type of dataset that has a row for every tick at every observation time stamp, the time varying variable of interest (temp, humidity), and survival true or false. 
+- apparently the survival package :: tmerge can do this for us?
+
+```{r climate variables vs tick survival}
+tickmclimate <- read_csv("tick18_w_climate.csv") %>% 
+  mutate(tickID = 1:nrow(tickmclimate)) %>%  # add an ID for each tick
+  mutate(times_checked = case_when(date_alive == "8/5/18" ~ 1, # this is gonna be messy as fuck but i'm going to make a column called "times_checked" 
+                               date_alive == "8/12/18" ~ 2, #that represents how many times that tick was checked before it died
+                               date_alive == "8/19/18"~ 3, #date needs to be in quotes which is stupid
+                               date_alive == "8/26/18" ~ 4,
+                               date_alive =="9/2/18" ~ 5, # OH MY GOD I JUST LEARNED YOU CAN HIGHLIGHT SOMETHING AND THEN TYPE A QUOTE AND ITLL QUOTE IT R I LOVE YOU
+                               date_alive =="9/16/18" ~ 6,
+                               date_alive =="9/30/18" ~ 7,
+                               date_alive =="10/7/18" ~ 8,
+                               date_alive =="10/21/18" ~ 9)) %>% #ok, now we need to multiply each tick obs row by the amount of times it was observed
+  uncount(times_checked, .remove = FALSE) %>% # hmmm.. we just end up with a bunch of rows of duplicate data without the correct dates or temps or anything
+  group_by_at(vars(2:14)) %>%  # allows me to group by variable numbers instead of names i guess?
+  mutate(check_num = row_number())
+
+#unique(tickmclimate$date_alive) # how many different check dates are there?
+
+# uhg, just realized I actually want to do all of the above to tick18_final and THEN append climate data now that the check_nums match --- go back to the previous chunk
+
+# ok but if we have the number of check times, and we know the temperature at that date at that check time.... I think we can do this
+
+# but i think we also need the microclimate dataset to be able to match up to the above using tick ID
+# problem lies in the microclimate dataset having mismatched entries (grouped by plotID and not by individual ticks)
+#i'm going to try and deal with this by first just x10ing the data (or multiplicating by the amount of times each tick was checkd... use uncount()?)
+```
 
 
 
