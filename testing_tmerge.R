@@ -51,3 +51,21 @@ head(tmc)
 View(tmc)
 
 #ok so this works how it's supposed to but we need to get the appropriate temp data in there
+
+
+
+
+#################################################### using two datasets, one with repeated measures
+view(pbc)
+temp <- subset(pbc, id <= 312, select = c(id:sex, stage))
+pbc2 <- tmerge(temp, temp, id = id , death = event(time, status)) #set range... what does this mean
+# tmerge is adding tstart (0) and tstop using time (# of days between registration and death, which = our days_elapsd)
+# tick18_2 <-tmerge(tick18, tick18, id = tickID, death = event (days_elapsd, death_t_f))
+
+# now incorporate other data
+pbc3 <- tmerge(pbc2, pbcseq, id = id, ascites = tdc(day, ascites), bili = tdc(day, ascites), albumin = tdc(day, albumin)) # adds a bunch of tdc's ie time dependent covariates
+View(pbc3)
+# tick18_3 <- tmerge(tick18_2, microclimate) .... dang, doesnt work perfectly because we have no ID to tmerge on, ID for the tick data is different (more) than for the climate data.
+
+# we can just make our final dataset mimic what pbc3 looks like:
+## we need to add a tstart and tstop for each one
